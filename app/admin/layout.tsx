@@ -6,24 +6,18 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 async function ensureAdmin() {
   const supabase = await createSupabaseServerClient();
-  if (!supabase) return { configured: false, role: "admin" };
+  if (!supabase) redirect("/login?error=Supabase%20is%20not%20configured");
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
   const { data } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (data?.role !== "admin") redirect("/");
-  return { configured: true, role: data.role };
+  if (data?.role !== "admin") redirect("/login?error=Admin%20access%20required");
 }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const state = await ensureAdmin();
+  await ensureAdmin();
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      {!state.configured && (
-        <div className="mb-4 rounded-card border border-accent/20 bg-accent/10 p-3 text-sm text-accent">
-          Supabase is not configured yet, so admin pages are shown in preview mode. Add environment variables to enforce authentication.
-        </div>
-      )}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm font-semibold text-accent">Admin</p>

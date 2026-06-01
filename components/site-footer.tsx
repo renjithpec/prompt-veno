@@ -19,7 +19,6 @@ export function SiteFooter({ settings }: { settings: Settings }) {
         <div className="grid gap-3 text-sm">
           <span className="font-semibold text-white">Creator</span>
           <a href={settings.instagram_url} target="_blank" rel="noreferrer" className="text-zinc-400 hover:text-accent">{settings.instagram_username}</a>
-          <Link href="/admin" className="text-zinc-400 hover:text-accent">Admin</Link>
           <Link href="/privacy" className="text-zinc-400 hover:text-accent">Privacy</Link>
         </div>
       </div>
