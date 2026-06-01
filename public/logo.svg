@@ -1,0 +1,17 @@
+<svg width="436" height="136" viewBox="0 0 436 136" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Prompt Veno">
+  <defs>
+    <linearGradient id="pv-lime" x1="21" y1="22" x2="126" y2="126" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D6FF7F"/>
+      <stop offset="1" stop-color="#B8FF4F"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="16" width="112" height="104" rx="28" fill="url(#pv-lime)"/>
+  <path d="M33 49H77.5C94.6 49 105.5 58.5 105.5 73.2C105.5 88.1 94.6 97.5 77.5 97.5H57V114H33V49Z" fill="#050505"/>
+  <path d="M57 69.4V79.8H76.5C82.1 79.8 85.5 77.5 85.5 73.1C85.5 68.7 82.1 66.4 76.5 66.4H57V69.4Z" fill="url(#pv-lime)"/>
+  <path d="M74.5 98.5H99.5L86.2 120H61.2L74.5 98.5Z" fill="#050505"/>
+  <path d="M100.2 74.5H123.8L99.2 120H75.6L100.2 74.5Z" fill="#050505"/>
+  <g fill="url(#pv-lime)">
+    <text x="144" y="66" font-family="Inter, Arial, sans-serif" font-size="50" font-weight="900" letter-spacing="-1">Prompt</text>
+    <text x="144" y="114" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="900" letter-spacing="-1">Veno.</text>
+  </g>
+</svg>
