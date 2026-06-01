@@ -6,46 +6,52 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.redirect(
-      new URL("/login?error=Supabase%20is%20not%20configured", request.url)
-    );
-  }
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
   let response = NextResponse.next({
     request,
   });
 
-  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-    cookies: {
-      getAll() {
-        return request.cookies.getAll();
-      },
+  const supabase = createServerClient(
+    supabaseUrl,
+    supabaseAnonKey,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
 
-      setAll(
-        cookiesToSet: {
-          name: string;
-          value: string;
-          options?: any;
-        }[]
-      ) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          request.cookies.set(name, value);
-          response.cookies.set(name, value, options);
-        });
+        setAll(cookiesToSet: any[]) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            request.cookies.set(name, value);
+            response.cookies.set(name, value, options);
+          });
+        },
       },
-    },
-  });
+    }
+  );
 
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(
+      new URL("/login", request.url)
+    );
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
+  if (!profile || profile.role !== "admin") {
+    return NextResponse.redirect(
+      new URL("/", request.url)
+    );
   }
 
   return response;
