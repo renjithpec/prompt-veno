@@ -88,7 +88,9 @@ export default async function HomePage() {
       <section className="mx-auto grid max-w-7xl gap-4 px-4 py-10 sm:px-6 md:grid-cols-3">
         {["The prompts feel expensive and save me hours every week.", "My Reels workflow is finally fast enough to post daily.", "The Instagram follow block turns prompt traffic into real audience growth."].map((quote, index) => (
           <AnimatedShell key={quote} className="glass rounded-card p-5">
-            <p className="text-sm leading-6 text-zinc-300">"{quote}"</p>
+            <p className="text-sm leading-6 text-zinc-300">
+              &quot;{quote}&quot;
+            </p>
             <p className="mt-4 text-sm font-semibold text-accent">Creator {index + 1}</p>
           </AnimatedShell>
         ))}
