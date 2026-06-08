@@ -157,8 +157,12 @@ export function SiteHeader() {
                 <Button variant="danger" size="lg" onClick={handleSignOut}>Sign Out</Button>
               ) : (
                 <>
-                  <Button asChild variant="secondary" size="lg"><Link href="/login">Sign in for free</Link></Button>
-                  <Button asChild size="lg"><Link href="/prompts">Get Started</Link></Button>
+                  <Button asChild variant="secondary" size="lg">
+                    <Link href="/login" onClick={() => setOpen(false)}>Sign in for free</Link>
+                  </Button>
+                  <Button asChild size="lg">
+                    <Link href="/prompts" onClick={() => setOpen(false)}>Get Started</Link>
+                  </Button>
                 </>
               )}
             </div>

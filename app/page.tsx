@@ -28,9 +28,19 @@ export default async function HomePage() {
             </div>
             <h1 className="text-balance text-5xl font-black leading-[0.94] tracking-normal sm:text-6xl lg:text-7xl">Create Viral AI Content Faster</h1>
             <p className="mt-6 max-w-2xl text-pretty text-lg leading-8 text-zinc-300">Discover premium AI prompts for Veo 3, ChatGPT, Flux, Midjourney, Kling, and Instagram creators.</p>
-            <div className="mt-8 grid gap-3 sm:flex">
+            <div className="mt-8 grid gap-3 sm:flex sm:flex-wrap">
               <Button asChild size="lg"><AnimatedLink href="/prompts" loadingText="Loading prompts...">Browse Prompts <ArrowRight className="h-4 w-4" /></AnimatedLink></Button>
               <Button asChild size="lg" variant="secondary"><Link href="/category/veo3">Explore Categories</Link></Button>
+              <Link 
+                href="/contribute" 
+                className="group relative inline-flex h-11 items-center justify-center overflow-hidden rounded-lg bg-accent/10 px-8 text-sm font-semibold text-accent ring-1 ring-accent/40 transition-all hover:bg-accent/20 hover:ring-accent hover:shadow-[0_0_20px_rgba(214,255,127,0.4)] hover:-translate-y-0.5 active:translate-y-0"
+              >
+                <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-accent/20 to-transparent group-hover:animate-shimmer" />
+                <span className="relative flex items-center gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  Contribute Prompt
+                </span>
+              </Link>
             </div>
           </AnimatedShell>
           <AnimatedShell className="grid gap-3">
