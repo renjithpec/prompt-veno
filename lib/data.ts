@@ -1,5 +1,5 @@
 import { unstable_noStore as noStore } from "next/cache";
-import type { Category, Prompt, Settings, Tag } from "@/lib/types";
+import type { Category, Prompt, Settings, Tag, Profile } from "@/lib/types";
 import { categories as sampleCategories, prompts as samplePrompts, settings as sampleSettings, tags as sampleTags } from "@/lib/sample-data";
 import { createSupabaseAdminClient, createSupabaseServerClient, hasSupabaseEnv } from "@/lib/supabase/server";
 

@@ -5,6 +5,7 @@ import { getUserProfile, getPrompts, checkIsFollowing } from "@/lib/data";
 import { PromptCard } from "@/components/prompt-card";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { FollowButton } from "./follow-button";
+import { Prompt } from "@/lib/types";
 
 export default async function UserProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -73,7 +74,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {prompts.map(prompt => (
+            {prompts.map((prompt: Prompt) => (
               <PromptCard key={prompt.id} prompt={prompt} />
             ))}
           </div>

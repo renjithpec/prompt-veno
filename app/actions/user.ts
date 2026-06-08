@@ -251,7 +251,7 @@ export async function updatePassword(formData: FormData) {
     if (!user) throw new Error("Unauthorized");
 
     // Only allow password change if they use email/password provider
-    if (user.app_metadata.provider !== "email" && !user.app_metadata.providers.includes("email")) {
+    if (user.app_metadata.provider !== "email" && !user.app_metadata.providers?.includes("email")) {
       return { error: "You are logged in with Google. You cannot change your password here." };
     }
 

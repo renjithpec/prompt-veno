@@ -44,6 +44,7 @@ export type Prompt = {
     follower_count?: number;
     instagram_url?: string | null;
   } | null;
+  status?: 'pending' | 'approved' | 'rejected';
   featured: boolean;
   views: number;
   copies: number;

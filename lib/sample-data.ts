@@ -35,6 +35,8 @@ const tagList = (...slugs: string[]) => slugs.map((slug) => tags.find((tag) => t
 export const prompts: Prompt[] = [
   {
     id: "prompt-veo-car",
+    user_id: "admin",
+    status: "approved",
     title: "Cinematic Veo 3 Car Commercial",
     slug: "cinematic-veo3-car-commercial",
     description: "A polished luxury car ad prompt with premium lighting, camera moves, and product drama.",
@@ -51,6 +53,8 @@ export const prompts: Prompt[] = [
   },
   {
     id: "prompt-chatgpt-hooks",
+    user_id: "admin",
+    status: "approved",
     title: "30 Reel Hooks For Any Niche",
     slug: "30-reel-hooks-for-any-niche",
     description: "Generate scroll-stopping hooks for creators, founders, coaches, and students.",
@@ -67,6 +71,8 @@ export const prompts: Prompt[] = [
   },
   {
     id: "prompt-flux-product",
+    user_id: "admin",
+    status: "approved",
     title: "Luxury Product Shoot In Flux",
     slug: "luxury-product-shoot-in-flux",
     description: "Create polished product imagery with controlled reflections and high-end campaign polish.",
@@ -83,6 +89,8 @@ export const prompts: Prompt[] = [
   },
   {
     id: "prompt-kling-fashion",
+    user_id: "admin",
+    status: "approved",
     title: "Kling Fashion Reel Motion",
     slug: "kling-fashion-reel-motion",
     description: "A crisp motion prompt for fashion creators and boutique brands.",
@@ -99,6 +107,8 @@ export const prompts: Prompt[] = [
   },
   {
     id: "prompt-midjourney-thumbnail",
+    user_id: "admin",
+    status: "approved",
     title: "Premium Thumbnail Concept",
     slug: "premium-thumbnail-concept",
     description: "Generate high-contrast creator thumbnails with strong visual hierarchy.",
@@ -115,6 +125,8 @@ export const prompts: Prompt[] = [
   },
   {
     id: "prompt-instagram-carousel",
+    user_id: "admin",
+    status: "approved",
     title: "Instagram Carousel Growth System",
     slug: "instagram-carousel-growth-system",
     description: "Turn one idea into a polished carousel with hook, structure, caption, and CTA.",
