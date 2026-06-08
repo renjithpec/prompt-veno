@@ -3,16 +3,18 @@ import type { Category, Prompt, Settings, Tag } from "@/lib/types";
 import { categories as sampleCategories, prompts as samplePrompts, settings as sampleSettings, tags as sampleTags } from "@/lib/sample-data";
 import { createSupabaseAdminClient, createSupabaseServerClient, hasSupabaseEnv } from "@/lib/supabase/server";
 
-type PromptRow = Omit<Prompt, "category" | "tags"> & {
+type PromptRow = Omit<Prompt, "category" | "tags" | "profiles"> & {
   categories: Category | null;
   prompt_tags: Array<{ tags: Tag | null }>;
+  profiles?: { name: string | null; avatar: string | null; is_verified?: boolean; follower_count?: number; instagram_url?: string | null } | null;
 };
 
 function normalizePrompt(row: PromptRow): Prompt {
   return {
     ...row,
     category: row.categories || undefined,
-    tags: row.prompt_tags.map((item) => item.tags).filter(Boolean) as Tag[]
+    tags: row.prompt_tags.map((item) => item.tags).filter(Boolean) as Tag[],
+    profiles: row.profiles || null
   };
 }
 
@@ -75,9 +77,11 @@ export async function getTags(): Promise<Tag[]> {
   return data?.length ? data : sampleTags;
 }
 
-export async function getPrompts(options: { query?: string; category?: string; tag?: string; sort?: string; featured?: boolean; limit?: number } = {}): Promise<Prompt[]> {
+export async function getPrompts(options: { query?: string; category?: string; tag?: string; sort?: string; featured?: boolean; limit?: number; status?: string; user_id?: string } = {}): Promise<Prompt[]> {
   noStore();
   const sort = options.sort || "trending";
+  const statusFilter = options.status || "approved";
+  
   const supabase = await createSupabaseServerClient();
   if (!supabase) {
     const local = searchLocalPrompts(options.query, options.category, options.tag, sort);
@@ -87,8 +91,10 @@ export async function getPrompts(options: { query?: string; category?: string; t
 
   let query = supabase
     .from("prompts")
-    .select(options.category ? "*, categories!inner(*), prompt_tags(tags(*))" : "*, categories(*), prompt_tags(tags(*))");
+    .select(options.category ? "*, categories!inner(*), prompt_tags(tags(*)), profiles(name, avatar, is_verified)" : "*, categories(*), prompt_tags(tags(*)), profiles(name, avatar, is_verified)");
 
+  if (statusFilter !== "all") query = query.eq("status", statusFilter);
+  if (options.user_id) query = query.eq("user_id", options.user_id);
   if (options.query) query = query.textSearch("search_vector", options.query, { type: "websearch" });
   if (options.featured) query = query.eq("featured", true);
   if (options.category) query = query.eq("categories.slug", options.category);
@@ -113,11 +119,26 @@ export async function getPromptBySlug(slug: string): Promise<Prompt | null> {
 
   const { data } = await supabase
     .from("prompts")
-    .select("*, categories(*), prompt_tags(tags(*))")
+    .select("*, categories(*), prompt_tags(tags(*)), profiles(name, avatar, is_verified, follower_count, instagram_url)")
     .eq("slug", slug)
+    .eq("status", "approved")
     .maybeSingle();
 
   return data ? normalizePrompt(data as PromptRow) : samplePrompts.find((prompt) => prompt.slug === slug) || null;
+}
+
+export async function getPromptById(id: string): Promise<Prompt | null> {
+  noStore();
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return samplePrompts.find((prompt) => prompt.id === id) || null;
+
+  const { data } = await supabase
+    .from("prompts")
+    .select("*, categories(*), prompt_tags(tags(*)), profiles(name, avatar, is_verified, follower_count, instagram_url)")
+    .eq("id", id)
+    .maybeSingle();
+
+  return data ? normalizePrompt(data as PromptRow) : samplePrompts.find((prompt) => prompt.id === id) || null;
 }
 
 export async function getCategoryBySlug(slug: string) {
@@ -134,7 +155,7 @@ export async function trackPromptEvent(slug: string, event: "view" | "copy") {
 }
 
 export async function getAdminStats() {
-  const promptList = await getPrompts({ sort: "trending" });
+  const promptList = await getPrompts({ sort: "trending", status: "all" });
   return {
     promptCount: promptList.length,
     copies: promptList.reduce((total, prompt) => total + prompt.copies, 0),
@@ -142,4 +163,23 @@ export async function getAdminStats() {
     categories: new Set(promptList.map((prompt) => prompt.category?.slug)).size,
     topPrompts: sortPrompts(promptList, "trending").slice(0, 5)
   };
+}
+
+export async function getUserProfile(id: string): Promise<Profile | null> {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return null;
+  const { data } = await supabase.from("profiles").select("*").eq("id", id).maybeSingle();
+  return data;
+}
+
+export async function checkIsFollowing(followerId: string, followingId: string): Promise<boolean> {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return false;
+  const { data } = await supabase
+    .from("user_follows")
+    .select("follower_id")
+    .eq("follower_id", followerId)
+    .eq("following_id", followingId)
+    .maybeSingle();
+  return !!data;
 }

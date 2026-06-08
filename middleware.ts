@@ -2,12 +2,13 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 export async function middleware(request: NextRequest) {
-  if (!request.nextUrl.pathname.startsWith("/admin")) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // If Supabase is not configured, skip auth checks
+  if (!supabaseUrl || !supabaseAnonKey) {
     return NextResponse.next();
   }
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
   let response = NextResponse.next({
     request,
@@ -32,31 +33,46 @@ export async function middleware(request: NextRequest) {
     }
   );
 
+  // Always refresh the session token — this validates the JWT and
+  // keeps the session alive. If the token is expired, Supabase
+  // will attempt to refresh it using the refresh token cookie.
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return NextResponse.redirect(
-      new URL("/login", request.url)
-    );
-  }
+  // Admin route protection — only authenticated admins can access /admin/*
+  if (request.nextUrl.pathname.startsWith("/admin")) {
+    if (!user) {
+      return NextResponse.redirect(
+        new URL("/login", request.url)
+      );
+    }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
 
-  if (!profile || profile.role !== "admin") {
-    return NextResponse.redirect(
-      new URL("/", request.url)
-    );
+    if (!profile || profile.role !== "admin") {
+      return NextResponse.redirect(
+        new URL("/", request.url)
+      );
+    }
   }
 
   return response;
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: [
+    /*
+     * Match all routes except:
+     * - _next/static (static files)
+     * - _next/image (image optimization)
+     * - favicon.ico, logo files, robots.txt, sitemap.xml
+     * - Public asset files (svg, png, jpg, etc.)
+     */
+    "/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)"
+  ],
 };

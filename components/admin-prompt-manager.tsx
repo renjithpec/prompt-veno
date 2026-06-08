@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { deletePrompt, updatePrompt } from "@/app/actions/admin";
+import { deletePrompt, updatePrompt, moderatePrompt } from "@/app/actions/admin";
 import { ImageUploadField } from "@/components/image-upload-field";
+import { SubmitButton } from "@/components/submit-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { Category, Prompt } from "@/lib/types";
@@ -24,27 +25,65 @@ export function AdminPromptManager({ prompts, categories }: { prompts: Prompt[];
               aria-expanded={isOpen}
             >
               <div className="min-w-0">
-                <p className="truncate font-semibold">{prompt.title}</p>
-                <p className="text-sm text-zinc-400">{prompt.views.toLocaleString()} views | {prompt.copies.toLocaleString()} copies</p>
+                <div className="flex items-center gap-2">
+                  <p className="truncate font-semibold">{prompt.title}</p>
+                  {prompt.status === 'pending' && <span className="rounded bg-yellow-500/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-yellow-500">Pending</span>}
+                  {prompt.status === 'rejected' && <span className="rounded bg-red-500/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-500">Rejected</span>}
+                </div>
+                <div className="flex items-center gap-2 text-sm text-zinc-400">
+                  <span>{prompt.views.toLocaleString()} views</span>
+                  <span>|</span>
+                  <span>{prompt.copies.toLocaleString()} copies</span>
+                  {prompt.profiles && (
+                    <>
+                      <span>|</span>
+                      <span className="flex items-center gap-1 text-accent">
+                        By {prompt.profiles.name || "Anonymous"}
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
               <span className="shrink-0 rounded-full border border-white/10 px-3 py-2 text-xs font-semibold text-accent">{isOpen ? "Close" : "Edit"}</span>
             </button>
 
             {isOpen && (
               <div className="mt-4 border-t border-white/10 pt-4">
+                {prompt.status === 'pending' && (
+                  <div className="mb-4 flex gap-2 rounded-card bg-yellow-500/10 p-3">
+                    <form action={moderatePrompt}>
+                      <input type="hidden" name="id" value={prompt.id} />
+                      <input type="hidden" name="status" value="approved" />
+                      <SubmitButton className="h-8 text-xs bg-green-500 text-white hover:bg-green-600">Approve</SubmitButton>
+                    </form>
+                    <form action={moderatePrompt}>
+                      <input type="hidden" name="id" value={prompt.id} />
+                      <input type="hidden" name="status" value="rejected" />
+                      <SubmitButton className="h-8 text-xs bg-red-500 text-white hover:bg-red-600">Reject</SubmitButton>
+                    </form>
+                  </div>
+                )}
+                
                 <form action={updatePrompt} className="grid gap-3">
                   <input type="hidden" name="id" value={prompt.id} />
                   <input type="hidden" name="current_slug" value={prompt.slug} />
                   <Input name="title" defaultValue={prompt.title} placeholder="Prompt title" required />
                   <Input name="description" defaultValue={prompt.description} placeholder="Description" required />
                   <ImageUploadField defaultValue={prompt.preview_image} />
-                  <select name="category_id" defaultValue={prompt.category_id} className="tap rounded-card border border-white/10 bg-white/5 px-4 text-sm text-white" required>
-                    {categories.map((category) => <option key={category.id} value={category.id} className="bg-black">{category.name}</option>)}
-                  </select>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <select name="category_id" defaultValue={prompt.category_id} className="tap rounded-card border border-white/10 bg-white/5 px-4 text-sm text-white" required>
+                      {categories.map((category) => <option key={category.id} value={category.id} className="bg-black">{category.name}</option>)}
+                    </select>
+                    <select name="status" defaultValue={prompt.status || 'approved'} className="tap rounded-card border border-white/10 bg-white/5 px-4 text-sm text-white" required>
+                      <option value="pending" className="bg-black">Pending</option>
+                      <option value="approved" className="bg-black">Approved</option>
+                      <option value="rejected" className="bg-black">Rejected</option>
+                    </select>
+                  </div>
                   <textarea name="prompt_content" defaultValue={prompt.prompt_content} placeholder="Prompt content" className="min-h-40 rounded-card border border-white/10 bg-white/5 p-4 text-sm text-white outline-none focus:border-accent/60" required />
                   <label className="flex items-center gap-2 text-sm text-zinc-300"><input name="featured" type="checkbox" defaultChecked={prompt.featured} className="h-4 w-4 accent-lime-300" /> Featured</label>
                   <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
-                    <Button type="submit">Save Changes</Button>
+                    <SubmitButton loadingText="Saving...">Save Changes</SubmitButton>
                     <Button asChild variant="secondary">
                       <a href={`/prompt/${prompt.slug}`} target="_blank" rel="noreferrer">View Prompt</a>
                     </Button>

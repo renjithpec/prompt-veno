@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Copy, Eye, Search, Sparkles, Users } from "lucide-react";
 import { AnimatedShell } from "@/components/animated-shell";
+import { AnimatedLink } from "@/components/animated-link";
 import { Button } from "@/components/ui/button";
 import { PromptCard } from "@/components/prompt-card";
 import { getCategories, getPrompts } from "@/lib/data";
@@ -28,7 +29,7 @@ export default async function HomePage() {
             <h1 className="text-balance text-5xl font-black leading-[0.94] tracking-normal sm:text-6xl lg:text-7xl">Create Viral AI Content Faster</h1>
             <p className="mt-6 max-w-2xl text-pretty text-lg leading-8 text-zinc-300">Discover premium AI prompts for Veo 3, ChatGPT, Flux, Midjourney, Kling, and Instagram creators.</p>
             <div className="mt-8 grid gap-3 sm:flex">
-              <Button asChild size="lg"><Link href="/prompts">Browse Prompts <ArrowRight className="h-4 w-4" /></Link></Button>
+              <Button asChild size="lg"><AnimatedLink href="/prompts" loadingText="Loading prompts...">Browse Prompts <ArrowRight className="h-4 w-4" /></AnimatedLink></Button>
               <Button asChild size="lg" variant="secondary"><Link href="/category/veo3">Explore Categories</Link></Button>
             </div>
           </AnimatedShell>
@@ -116,7 +117,7 @@ export default async function HomePage() {
         <div className="glass mx-auto max-w-5xl rounded-card p-6 text-center sm:p-10">
           <h2 className="text-3xl font-black sm:text-4xl">Start with the prompts creators copy most.</h2>
           <p className="mx-auto mt-3 max-w-2xl text-zinc-400">Open the marketplace, search your niche, and copy a premium prompt in seconds.</p>
-          <Button asChild size="lg" className="mt-6"><Link href="/prompts">Browse Prompts</Link></Button>
+          <Button asChild size="lg" className="mt-6"><AnimatedLink href="/prompts" loadingText="Loading prompts...">Browse Prompts</AnimatedLink></Button>
         </div>
       </section>
     </>

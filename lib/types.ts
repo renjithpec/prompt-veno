@@ -4,6 +4,10 @@ export type Profile = {
   name: string | null;
   avatar: string | null;
   role: "admin" | "user";
+  is_verified: boolean;
+  follower_count: number;
+  following_count: number;
+  instagram_url: string | null;
   created_at: string;
 };
 
@@ -24,6 +28,7 @@ export type Tag = {
 
 export type Prompt = {
   id: string;
+  user_id: string;
   title: string;
   slug: string;
   description: string;
@@ -32,6 +37,13 @@ export type Prompt = {
   category_id: string;
   category?: Category;
   tags: Tag[];
+  profiles?: {
+    name: string | null;
+    avatar: string | null;
+    is_verified?: boolean;
+    follower_count?: number;
+    instagram_url?: string | null;
+  } | null;
   featured: boolean;
   views: number;
   copies: number;

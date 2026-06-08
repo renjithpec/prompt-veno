@@ -1,4 +1,5 @@
 import { createTag, deleteTag } from "@/app/actions/admin";
+import { SubmitButton } from "@/components/submit-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getTags } from "@/lib/data";
@@ -11,7 +12,7 @@ export default async function AdminTagsPage() {
       <form action={createTag} className="glass grid gap-3 rounded-card p-5">
         <h2 className="text-xl font-bold">Add Tag</h2>
         <Input name="name" placeholder="Tag name" required />
-        <Button type="submit">Save Tag</Button>
+        <SubmitButton loadingText="Saving...">Save Tag</SubmitButton>
       </form>
       <div className="glass rounded-card p-5">
         <h2 className="text-xl font-bold">Manage Tags</h2>

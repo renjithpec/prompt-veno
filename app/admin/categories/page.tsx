@@ -1,4 +1,5 @@
 import { createCategory, deleteCategory } from "@/app/actions/admin";
+import { SubmitButton } from "@/components/submit-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getCategories } from "@/lib/data";
@@ -13,7 +14,7 @@ export default async function AdminCategoriesPage() {
         <Input name="name" placeholder="Category name" required />
         <Input name="icon" placeholder="Lucide icon name" defaultValue="Sparkles" required />
         <textarea name="description" placeholder="Description" className="min-h-28 rounded-card border border-white/10 bg-white/5 p-4 text-sm text-white outline-none focus:border-accent/60" required />
-        <Button type="submit">Save Category</Button>
+        <SubmitButton loadingText="Saving...">Save Category</SubmitButton>
       </form>
       <div className="glass rounded-card p-5">
         <h2 className="text-xl font-bold">Manage Categories</h2>

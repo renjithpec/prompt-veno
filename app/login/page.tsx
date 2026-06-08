@@ -1,24 +1,133 @@
-import { signInWithEmail, signInWithGoogle } from "@/app/actions/auth";
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { signInWithEmail, signUpWithEmail, signInWithGoogle } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SubmitButton } from "@/components/submit-button";
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  const params = await searchParams;
+export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const errorMsg = searchParams.get("error");
+  const successMsg = searchParams.get("success");
+  const defaultMode = searchParams.get("mode") === "signup" ? "signup" : "signin";
+
+  const [mode, setMode] = useState<"signin" | "signup">(defaultMode);
 
   return (
     <section className="mx-auto grid min-h-[calc(100svh-64px)] max-w-md content-center px-4 py-12">
       <div className="glass rounded-card p-5">
-        <h1 className="text-3xl font-black">Login</h1>
-        <p className="mt-2 text-sm leading-6 text-zinc-400">Sign in to manage prompts, settings, categories, tags, and analytics.</p>
-        {params.error && <p className="mt-4 rounded-card border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-200">{params.error}</p>}
-        <form action={signInWithEmail} className="mt-5 grid gap-3">
-          <Input name="email" type="email" autoComplete="email" placeholder="Email" required />
-          <Input name="password" type="password" autoComplete="current-password" placeholder="Password" required />
-          <Button type="submit">Login</Button>
+        {/* Tab Toggle */}
+        <div className="mb-5 flex rounded-card border border-white/10 bg-white/[0.03] p-1">
+          <button
+            type="button"
+            onClick={() => setMode("signin")}
+            className={`flex-1 rounded-[10px] py-2.5 text-sm font-semibold transition-all ${
+              mode === "signin"
+                ? "bg-accent text-black shadow-glow"
+                : "text-zinc-400 hover:text-white"
+            }`}
+          >
+            Sign In
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("signup")}
+            className={`flex-1 rounded-[10px] py-2.5 text-sm font-semibold transition-all ${
+              mode === "signup"
+                ? "bg-accent text-black shadow-glow"
+                : "text-zinc-400 hover:text-white"
+            }`}
+          >
+            Sign Up
+          </button>
+        </div>
+
+        <h1 className="text-3xl font-black">
+          {mode === "signin" ? "Welcome back" : "Create your account"}
+        </h1>
+        <p className="mt-2 text-sm leading-6 text-zinc-400">
+          {mode === "signin"
+            ? "Sign in to access your saved prompts, favorites, and more."
+            : "Join for free and start discovering premium AI prompts."}
+        </p>
+
+        {/* Success message */}
+        {successMsg && (
+          <p className="mt-4 rounded-card border border-green-500/20 bg-green-500/10 p-3 text-sm text-green-200">
+            {successMsg}
+          </p>
+        )}
+
+        {/* Error message */}
+        {errorMsg && (
+          <p className="mt-4 rounded-card border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-200">
+            {errorMsg}
+          </p>
+        )}
+
+        {/* Sign In Form */}
+        {mode === "signin" && (
+          <form action={signInWithEmail} className="mt-5 grid gap-3">
+            <Input name="email" type="email" autoComplete="email" placeholder="Email" required />
+            <Input name="password" type="password" autoComplete="current-password" placeholder="Password" required />
+            <SubmitButton loadingText="Signing in...">Sign In</SubmitButton>
+          </form>
+        )}
+
+        {/* Sign Up Form */}
+        {mode === "signup" && (
+          <form action={signUpWithEmail} className="mt-5 grid gap-3">
+            <Input name="name" type="text" autoComplete="name" placeholder="Full Name" required />
+            <Input name="email" type="email" autoComplete="email" placeholder="Email" required />
+            <Input name="password" type="password" autoComplete="new-password" placeholder="Password (min 6 characters)" required minLength={6} />
+            <SubmitButton loadingText="Creating account...">Create Account</SubmitButton>
+          </form>
+        )}
+
+        {/* Divider */}
+        <div className="relative my-5">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-white/10" />
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-[#0a0a0a] px-3 text-xs text-zinc-500">or continue with</span>
+          </div>
+        </div>
+
+        {/* Google OAuth */}
+        <form action={signInWithGoogle}>
+          <SubmitButton variant="secondary" className="w-full" loadingText="Connecting...">
+            <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+            </svg>
+            Continue with Google
+          </SubmitButton>
         </form>
-        <form action={signInWithGoogle} className="mt-3">
-          <Button type="submit" variant="secondary" className="w-full">Continue with Google</Button>
-        </form>
+
+        {/* Toggle message */}
+        <p className="mt-5 text-center text-sm text-zinc-500">
+          {mode === "signin" ? (
+            <>
+              Don&apos;t have an account?{" "}
+              <button type="button" onClick={() => setMode("signup")} className="font-semibold text-accent hover:underline">
+                Sign up for free
+              </button>
+            </>
+          ) : (
+            <>
+              Already have an account?{" "}
+              <button type="button" onClick={() => setMode("signin")} className="font-semibold text-accent hover:underline">
+                Sign in
+              </button>
+            </>
+          )}
+        </p>
       </div>
     </section>
   );

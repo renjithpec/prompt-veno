@@ -1,11 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import type { Category, Prompt, Tag } from "@/lib/types";
 import { PromptCard } from "@/components/prompt-card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LogoSpinner } from "@/components/logo-spinner";
 
 export function MarketplaceClient({ prompts, categories, tags, initialQuery = "", initialCategory = "all", initialTag = "all", initialSort = "trending" }: {
   prompts: Prompt[];
@@ -20,6 +22,7 @@ export function MarketplaceClient({ prompts, categories, tags, initialQuery = ""
   const [category, setCategory] = useState(initialCategory);
   const [tag, setTag] = useState(initialTag);
   const [sort, setSort] = useState(initialSort);
+  const router = useRouter();
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -35,24 +38,43 @@ export function MarketplaceClient({ prompts, categories, tags, initialQuery = ""
       });
   }, [category, prompts, query, sort, tag]);
 
+  const [isPending, startTransition] = React.useTransition();
+
+  const handleCategoryChange = (val: string) => {
+    setCategory(val);
+    startTransition(() => {
+      if (val === "all") router.push("/prompts");
+      else router.push(`/category/${val}`);
+    });
+  };
+
   const suggestions = query ? filtered.slice(0, 4) : [];
 
   return (
-    <div className="grid gap-6">
-      <div className="glass rounded-card p-3 sm:p-4">
-        <div className="grid gap-3 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          <label className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
-            <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search viral prompts" className="pl-10" />
-          </label>
-          <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger><SelectValue placeholder="Category" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All categories</SelectItem>
-              {categories.map((item) => <SelectItem key={item.id} value={item.slug}>{item.name}</SelectItem>)}
-            </SelectContent>
-          </Select>
-          <Select value={tag} onValueChange={setTag}>
+    <>
+      {isPending && (
+        <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm transition-all">
+          <LogoSpinner className="h-24 w-24" />
+          <p className="mt-6 text-sm font-medium tracking-wide text-zinc-300 animate-pulse">
+            Loading...
+          </p>
+        </div>
+      )}
+      <div className="grid gap-6">
+        <div className="glass rounded-card p-3 sm:p-4">
+          <div className="grid gap-3 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+            <label className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+              <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search viral prompts" className="pl-10" />
+            </label>
+            <Select value={category} onValueChange={handleCategoryChange}>
+              <SelectTrigger><SelectValue placeholder="Category" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All categories</SelectItem>
+                {categories.map((item) => <SelectItem key={item.id} value={item.slug}>{item.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={tag} onValueChange={setTag}>
             <SelectTrigger><SelectValue placeholder="Tag" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All tags</SelectItem>
@@ -86,6 +108,7 @@ export function MarketplaceClient({ prompts, categories, tags, initialQuery = ""
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.map((prompt) => <PromptCard key={prompt.id} prompt={prompt} />)}
       </div>
-    </div>
+      </div>
+    </>
   );
 }

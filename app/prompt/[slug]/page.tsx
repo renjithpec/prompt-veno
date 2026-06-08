@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Calendar, Copy, Eye, Instagram } from "lucide-react";
+import { Calendar, Copy, Eye, Instagram, BadgeCheck } from "lucide-react";
 import { notFound } from "next/navigation";
 import { CopyPromptButton } from "@/components/copy-prompt-button";
 import { PromptCard } from "@/components/prompt-card";
 import { Button } from "@/components/ui/button";
-import { getPromptBySlug, getPrompts, getSettings, trackPromptEvent } from "@/lib/data";
+import { getPromptBySlug, getPrompts, getSettings, trackPromptEvent, checkIsFollowing } from "@/lib/data";
 import { absoluteUrl } from "@/lib/utils";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { FollowButton } from "@/app/user/[id]/follow-button";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -51,6 +53,23 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
     author: { "@type": "Person", name: settings.creator_name, sameAs: settings.instagram_url }
   };
 
+  let isFollowing = false;
+  let isSelf = false;
+  
+  const supabase = await createSupabaseServerClient();
+  if (supabase) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user && prompt.user_id) {
+      if (user.id === prompt.user_id) isSelf = true;
+      else isFollowing = await checkIsFollowing(user.id, prompt.user_id);
+    }
+  }
+
+  const authorName = prompt.profiles?.name || settings.creator_name;
+  const authorAvatar = prompt.profiles?.avatar || "/placeholder.jpg";
+  const authorUsername = prompt.profiles?.name ? `@${prompt.profiles.name.toLowerCase().replace(/[^a-z0-9]/g, "")}` : settings.instagram_username;
+  const authorInstagram = prompt.profiles?.instagram_url || settings.instagram_url;
+
   return (
     <article className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -84,17 +103,27 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <section className="glass rounded-card p-5">
             <div className="flex items-center gap-4">
-              <Image src={settings.creator_avatar} alt={settings.creator_name} width={64} height={64} className="h-16 w-16 rounded-full object-cover ring-2 ring-accent/50" />
-              <div className="min-w-0">
-                <h2 className="truncate text-lg font-bold">{settings.creator_name}</h2>
-                <p className="truncate text-sm text-accent">{settings.instagram_username}</p>
+              <Link href={prompt.user_id ? `/user/${prompt.user_id}` : "#"} className="shrink-0">
+                <Image src={authorAvatar} alt={authorName} width={64} height={64} className="h-16 w-16 rounded-full object-cover ring-2 ring-accent/50" />
+              </Link>
+              <div className="min-w-0 flex-1">
+                <Link href={prompt.user_id ? `/user/${prompt.user_id}` : "#"} className="flex items-center gap-1 hover:text-accent">
+                  <h2 className="truncate text-lg font-bold">{authorName}</h2>
+                  {(prompt.profiles?.is_verified) && <BadgeCheck className="h-4 w-4 shrink-0 text-blue-400" />}
+                </Link>
+                <p className="truncate text-sm text-accent">{authorUsername}</p>
               </div>
             </div>
             <p className="mt-4 text-sm leading-6 text-zinc-300">Follow me on Instagram for more premium prompts and daily AI content.</p>
             <div className="mt-5 grid gap-3">
-              <Button asChild size="lg" className="bg-gradient-to-r from-accent to-accent-deep text-black">
-                <a href={settings.instagram_url} target="_blank" rel="noreferrer"><Instagram className="h-5 w-5" />Follow on Instagram</a>
-              </Button>
+              {!isSelf && prompt.user_id && (
+                <FollowButton userId={prompt.user_id} initialIsFollowing={isFollowing} />
+              )}
+              {authorInstagram && (
+                <Button asChild size="lg" className="bg-gradient-to-r from-accent to-accent-deep text-black">
+                  <a href={authorInstagram} target="_blank" rel="noreferrer"><Instagram className="h-5 w-5 mr-2" />Follow on Instagram</a>
+                </Button>
+              )}
               <CopyPromptButton prompt={prompt} />
             </div>
           </section>

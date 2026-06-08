@@ -1,6 +1,6 @@
 import { updateSettings } from "@/app/actions/admin";
 import { ImageUploadField } from "@/components/image-upload-field";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { getSettings } from "@/lib/data";
 
@@ -21,7 +21,7 @@ export default async function AdminSettingsPage() {
         placeholder="Profile picture URL"
         label="Upload Creator Avatar"
       />
-      <Button type="submit">Update Settings</Button>
+      <SubmitButton loadingText="Updating...">Update Settings</SubmitButton>
     </form>
   );
 }

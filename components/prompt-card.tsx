@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Copy, Eye, ExternalLink } from "lucide-react";
+import { Copy, Eye, ExternalLink, BadgeCheck } from "lucide-react";
 import type { Prompt } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { CopyPromptButton } from "@/components/copy-prompt-button";
@@ -17,6 +17,23 @@ export function PromptCard({ prompt }: { prompt: Prompt }) {
       </Link>
       <div className="grid gap-4 p-4">
         <div>
+          {prompt.profiles && (
+            <Link href={`/user/${prompt.user_id}`} className="mb-3 flex items-center gap-2 group/author">
+              <div className="relative h-6 w-6 overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10 group-hover/author:ring-accent">
+                {prompt.profiles.avatar ? (
+                  <Image src={prompt.profiles.avatar} alt={prompt.profiles.name || "User"} fill className="object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-accent text-[10px] font-bold text-black">
+                    {(prompt.profiles.name || "U")[0].toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-1 text-xs font-medium text-zinc-300 group-hover/author:text-white">
+                {prompt.profiles.name || "Anonymous"}
+                {(prompt.profiles.is_verified) && <BadgeCheck className="h-3.5 w-3.5 text-blue-400" />}
+              </div>
+            </Link>
+          )}
           <Link href={`/prompt/${prompt.slug}`} className="line-clamp-2 text-lg font-semibold text-white hover:text-accent">{prompt.title}</Link>
           <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-400">{prompt.description}</p>
         </div>
