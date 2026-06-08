@@ -52,10 +52,15 @@ export async function signInWithGoogle() {
   if (!supabase) redirect("/login?error=Supabase%20is%20not%20configured");
 
   try {
+    const reqHeaders = await headers();
+    const host = reqHeaders.get("host") || "localhost:3000";
+    const protocol = host.includes("localhost") || host.match(/^\d{1,3}\.\d{1,3}/) ? "http" : "https";
+    const origin = `${protocol}://${host}`;
+
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/callback`
+        redirectTo: `${origin}/auth/callback`
       }
     });
     if (error || !data.url) redirect(`/login?error=${encodeURIComponent("Unable to start Google login")}`);
