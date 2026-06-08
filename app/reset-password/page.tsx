@@ -14,7 +14,7 @@ export default function ResetPasswordPage() {
       <div className="glass overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] p-6 sm:p-8">
         <h1 className="text-2xl font-black mb-2">Reset Password</h1>
         <p className="text-sm text-zinc-400 mb-6">
-          Enter your email address and we'll send you a link to reset your password.
+          Enter your email address and we&apos;ll send you a link to reset your password.
         </p>
 
         {state?.success && (
