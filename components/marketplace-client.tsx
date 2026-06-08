@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import type { Category, Prompt, Tag } from "@/lib/types";
 import { PromptCard } from "@/components/prompt-card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LogoSpinner } from "@/components/logo-spinner";
 
