@@ -72,7 +72,12 @@ export default function LoginPage() {
         {mode === "signin" && (
           <form action={signInWithEmail} className="mt-5 grid gap-3">
             <Input name="email" type="email" autoComplete="email" placeholder="Email" required />
-            <Input name="password" type="password" autoComplete="current-password" placeholder="Password" required />
+            <div className="flex flex-col gap-1">
+              <Input name="password" type="password" autoComplete="current-password" placeholder="Password" required />
+              <Link href="/reset-password" className="text-right text-xs font-semibold text-zinc-400 hover:text-white transition-colors">
+                Forgot password?
+              </Link>
+            </div>
             <SubmitButton loadingText="Signing in...">Sign In</SubmitButton>
           </form>
         )}

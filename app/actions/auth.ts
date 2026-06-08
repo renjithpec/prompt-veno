@@ -177,3 +177,44 @@ export async function signOut() {
   }
   redirect("/");
 }
+
+export async function resetPassword(prevState: any, formData: FormData) {
+  const email = formData.get("email") as string;
+  if (!email) return { error: "Email is required" };
+
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return { error: "Supabase is not configured" };
+
+  const reqHeaders = await headers();
+  const host = reqHeaders.get("host") || "localhost:3000";
+  const protocol = host.includes("localhost") || host.match(/^\d{1,3}\.\d{1,3}/) ? "http" : "https";
+  const origin = `${protocol}://${host}`;
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?next=/update-password`,
+  });
+
+  if (error) {
+    console.error("[resetPassword]", error.message);
+    return { error: "Failed to send reset link. Please try again." };
+  }
+
+  return { success: true, message: "Check your email for a password reset link." };
+}
+
+export async function updatePassword(prevState: any, formData: FormData) {
+  const password = formData.get("password") as string;
+  if (!password || password.length < 6) return { error: "Password must be at least 6 characters" };
+
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return { error: "Supabase is not configured" };
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    console.error("[updatePassword]", error.message);
+    return { error: error.message };
+  }
+
+  redirect("/?success=Password%20updated%20successfully");
+}

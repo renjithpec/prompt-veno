@@ -26,5 +26,10 @@ export async function GET(request: Request) {
     }
   }
 
+  const next = requestUrl.searchParams.get("next");
+  if (next) {
+    return NextResponse.redirect(new URL(next, request.url));
+  }
+
   return NextResponse.redirect(new URL("/", request.url));
 }
