@@ -70,7 +70,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
         <h2 className="text-xl font-semibold text-white border-b border-white/10 pb-4">Prompts</h2>
         {prompts.length === 0 ? (
           <div className="rounded-card border border-dashed border-white/10 bg-white/5 p-12 text-center text-zinc-400">
-            This user hasn't contributed any approved prompts yet.
+            This user hasn&apos;t contributed any approved prompts yet.
           </div>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

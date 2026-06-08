@@ -239,7 +239,7 @@ export function SettingsClient({ user, profile, userPrompts }: { user: User; pro
           <div className="space-y-3">
             {userPrompts.length === 0 ? (
               <div className="rounded-xl border border-dashed border-white/10 bg-black/20 p-8 text-center">
-                <p className="text-sm text-zinc-400">You haven't submitted any prompts yet.</p>
+                <p className="text-sm text-zinc-400">You haven&apos;t submitted any prompts yet.</p>
               </div>
             ) : (
               userPrompts.map(prompt => (

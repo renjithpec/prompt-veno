@@ -25,9 +25,9 @@ export default async function EditPromptPage({ params }: { params: Promise<{ id:
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Edit Prompt</h1>
-        <p className="mt-4 text-lg text-zinc-400">Update your prompt's details below.</p>
+        <p className="mt-4 text-lg text-zinc-400">Update your prompt&apos;s details below.</p>
         <p className="mt-2 text-sm text-yellow-500 bg-yellow-500/10 inline-block px-3 py-1 rounded-full border border-yellow-500/20">
-          Note: Editing will return your prompt to "Pending" status for review.
+          Note: Editing will return your prompt to &quot;Pending&quot; status for review.
         </p>
       </div>
 
