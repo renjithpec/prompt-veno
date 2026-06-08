@@ -85,9 +85,9 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
           </div>
 
           {/* Mobile Follow Button (Hidden on Desktop) */}
-          <div className="w-full max-w-xs sm:hidden">
+          <div className="w-full sm:hidden">
             {!isSelf && (
-              <FollowButton userId={id} initialIsFollowing={isFollowing} />
+              <FollowButton userId={id} initialIsFollowing={isFollowing} className="w-full" />
             )}
           </div>
         </div>

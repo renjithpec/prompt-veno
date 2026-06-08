@@ -8,10 +8,12 @@ import { useRouter } from "next/navigation";
 
 export function FollowButton({ 
   userId, 
-  initialIsFollowing 
+  initialIsFollowing,
+  className
 }: { 
   userId: string;
   initialIsFollowing: boolean;
+  className?: string;
 }) {
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
   const [loading, setLoading] = useState(false);
@@ -40,7 +42,7 @@ export function FollowButton({
       onClick={handleToggle} 
       variant={isFollowing ? "secondary" : "primary"}
       disabled={loading}
-      className={isFollowing ? "border border-white/10" : "bg-accent text-black hover:bg-accent/90"}
+      className={`${isFollowing ? "border border-white/10" : "bg-accent text-black hover:bg-accent/90"} ${className || ""}`}
     >
       {loading ? (
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
