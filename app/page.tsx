@@ -24,7 +24,7 @@ export default async function HomePage() {
           <AnimatedShell className="max-w-3xl">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/[0.08] px-3 py-2 text-sm text-accent">
               <Sparkles className="h-4 w-4" />
-              Built for creators arriving from Instagram Reels
+              Unleash your creative potential today
             </div>
             <h1 className="text-balance text-5xl font-black leading-[0.94] tracking-normal sm:text-6xl lg:text-7xl">Create Viral AI Content Faster</h1>
             <p className="mt-6 max-w-2xl text-pretty text-lg leading-8 text-zinc-300">Discover premium AI prompts for Veo 3, ChatGPT, Flux, Midjourney, Kling, and Instagram creators.</p>
