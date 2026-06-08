@@ -25,7 +25,7 @@ export default async function AdminPage() {
         <h2 className="text-xl font-bold">Popular Prompts</h2>
         <div className="mt-4 grid gap-3">
           {stats.topPrompts.map((prompt) => (
-            <div key={prompt.id} className="flex items-center justify-between gap-4 rounded-card border border-white/10 p-3">
+            <div key={prompt.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-card border border-white/10 p-3">
               <div className="min-w-0">
                 <p className="truncate font-semibold">{prompt.title}</p>
                 <p className="text-sm text-zinc-400">{prompt.category?.name}</p>

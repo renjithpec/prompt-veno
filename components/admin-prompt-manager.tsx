@@ -21,30 +21,30 @@ export function AdminPromptManager({ prompts, categories }: { prompts: Prompt[];
             <button
               type="button"
               onClick={() => setOpenId(isOpen ? null : prompt.id)}
-              className="flex w-full cursor-pointer items-center justify-between gap-3 text-left"
+              className="flex flex-col sm:flex-row w-full cursor-pointer items-start sm:items-center justify-between gap-3 text-left"
               aria-expanded={isOpen}
             >
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
+              <div className="min-w-0 w-full sm:w-auto flex-1">
+                <div className="flex flex-wrap items-center gap-2">
                   <p className="truncate font-semibold">{prompt.title}</p>
                   {prompt.status === 'pending' && <span className="rounded bg-yellow-500/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-yellow-500">Pending</span>}
                   {prompt.status === 'rejected' && <span className="rounded bg-red-500/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-500">Rejected</span>}
                 </div>
-                <div className="flex items-center gap-2 text-sm text-zinc-400">
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-sm text-zinc-400 mt-1">
                   <span>{prompt.views.toLocaleString()} views</span>
-                  <span>|</span>
+                  <span className="hidden sm:inline">|</span>
                   <span>{prompt.copies.toLocaleString()} copies</span>
                   {prompt.profiles && (
                     <>
-                      <span>|</span>
-                      <span className="flex items-center gap-1 text-accent">
+                      <span className="hidden sm:inline">|</span>
+                      <span className="flex items-center gap-1 text-accent w-full sm:w-auto">
                         By {prompt.profiles.name || "Anonymous"}
                       </span>
                     </>
                   )}
                 </div>
               </div>
-              <span className="shrink-0 rounded-full border border-white/10 px-3 py-2 text-xs font-semibold text-accent">{isOpen ? "Close" : "Edit"}</span>
+              <span className="shrink-0 rounded-full border border-white/10 px-3 py-1.5 sm:py-2 text-xs font-semibold text-accent">{isOpen ? "Close" : "Edit"}</span>
             </button>
 
             {isOpen && (

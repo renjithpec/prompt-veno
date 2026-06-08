@@ -221,7 +221,7 @@ export function SettingsClient({ user, profile, userPrompts }: { user: User; pro
 
         {/* My Submissions */}
         <div className="rounded-card border border-white/10 bg-[#090909] p-6 shadow-2xl">
-          <div className="mb-6 flex items-center justify-between">
+          <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-lime-500/20 text-lime-400">
                 <Sparkles className="h-5 w-5" />
@@ -243,42 +243,46 @@ export function SettingsClient({ user, profile, userPrompts }: { user: User; pro
               </div>
             ) : (
               userPrompts.map(prompt => (
-                <div key={prompt.id} className="group relative flex items-center gap-4 rounded-xl border border-white/5 bg-black/40 p-3 pr-4 transition hover:bg-white/[0.02]">
+                <div key={prompt.id} className="group relative flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 rounded-xl border border-white/5 bg-black/40 p-3 sm:pr-4 transition hover:bg-white/[0.02]">
                   {prompt.status === 'approved' ? (
                     <Link href={`/prompt/${prompt.slug}`} className="absolute inset-0 z-0" aria-label="View prompt"></Link>
                   ) : null}
-                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg z-10 pointer-events-none">
-                    <Image src={prompt.preview_image} alt={prompt.title} fill className="object-cover" />
+                  <div className="flex w-full sm:w-auto flex-1 items-center gap-3 sm:gap-4 min-w-0">
+                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg z-10 pointer-events-none">
+                      <Image src={prompt.preview_image} alt={prompt.title} fill className="object-cover" />
+                    </div>
+                    <div className="flex-1 min-w-0 z-10 pointer-events-none">
+                      <h3 className="truncate font-medium text-white group-hover:text-accent transition-colors">{prompt.title}</h3>
+                      <p className="truncate text-xs text-zinc-400">{prompt.category?.name}</p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0 z-10 pointer-events-none">
-                    <h3 className="truncate font-medium text-white group-hover:text-accent transition-colors">{prompt.title}</h3>
-                    <p className="truncate text-xs text-zinc-400">{prompt.category?.name}</p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-3 z-10">
+                  <div className="flex w-full sm:w-auto shrink-0 items-center justify-between sm:justify-end gap-3 z-10 pl-17 sm:pl-0">
                     <div className="flex shrink-0 items-center gap-1.5">
                       {prompt.status === 'pending' && <span className="flex items-center gap-1.5 rounded-full bg-yellow-500/10 px-2.5 py-1 text-xs font-medium text-yellow-400"><Clock className="h-3.5 w-3.5" /> Pending</span>}
                       {prompt.status === 'approved' && <span className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-green-400"><CheckCircle className="h-3.5 w-3.5" /> Approved</span>}
                       {prompt.status === 'rejected' && <span className="flex items-center gap-1.5 rounded-full bg-red-500/10 px-2.5 py-1 text-xs font-medium text-red-400"><XCircle className="h-3.5 w-3.5" /> Rejected</span>}
                     </div>
-                    <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-zinc-400 hover:text-white pointer-events-auto">
-                      <Link href={`/edit-prompt/${prompt.id}`} title="Edit Prompt">
-                        <Edit2 className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 text-zinc-400 hover:text-red-500 pointer-events-auto"
-                      title="Delete Prompt"
-                      onClick={async (e) => {
-                        e.preventDefault();
-                        if (confirm("Are you sure you want to delete this prompt? This cannot be undone.")) {
-                          await deletePrompt(prompt.id);
-                        }
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      <Button asChild variant="ghost" size="icon" className="h-8 w-8 text-zinc-400 hover:text-white pointer-events-auto">
+                        <Link href={`/edit-prompt/${prompt.id}`} title="Edit Prompt">
+                          <Edit2 className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-zinc-400 hover:text-red-500 pointer-events-auto"
+                        title="Delete Prompt"
+                        onClick={async (e) => {
+                          e.preventDefault();
+                          if (confirm("Are you sure you want to delete this prompt? This cannot be undone.")) {
+                            await deletePrompt(prompt.id);
+                          }
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))
