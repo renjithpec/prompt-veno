@@ -9,6 +9,11 @@ export async function GET(request: Request) {
     const supabase = await createSupabaseServerClient();
     await supabase?.auth.exchangeCodeForSession(code);
 
+    const next = requestUrl.searchParams.get("next");
+    if (next) {
+      return NextResponse.redirect(new URL(next, request.url));
+    }
+
     // Check if the user is an admin to redirect accordingly
     if (supabase) {
       const { data: { user } } = await supabase.auth.getUser();
@@ -26,9 +31,9 @@ export async function GET(request: Request) {
     }
   }
 
-  const next = requestUrl.searchParams.get("next");
-  if (next) {
-    return NextResponse.redirect(new URL(next, request.url));
+  const nextFallback = requestUrl.searchParams.get("next");
+  if (nextFallback) {
+    return NextResponse.redirect(new URL(nextFallback, request.url));
   }
 
   return NextResponse.redirect(new URL("/", request.url));
