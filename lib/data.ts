@@ -183,3 +183,43 @@ export async function checkIsFollowing(followerId: string, followingId: string):
     .maybeSingle();
   return !!data;
 }
+
+export async function getFollowers(userId: string): Promise<{ id: string; name: string | null; avatar: string | null; instagram_url: string | null }[]> {
+  if (!hasSupabaseEnv()) return [];
+  const supabase = createSupabaseAdminClient();
+  if (!supabase) return [];
+  
+  const { data } = await supabase
+    .from("user_follows")
+    .select(`
+      profiles!user_follows_follower_id_fkey (
+        id,
+        name,
+        avatar,
+        instagram_url
+      )
+    `)
+    .eq("following_id", userId);
+    
+  return (data || []).map((row: any) => row.profiles as any);
+}
+
+export async function getFollowing(userId: string): Promise<{ id: string; name: string | null; avatar: string | null; instagram_url: string | null }[]> {
+  if (!hasSupabaseEnv()) return [];
+  const supabase = createSupabaseAdminClient();
+  if (!supabase) return [];
+  
+  const { data } = await supabase
+    .from("user_follows")
+    .select(`
+      profiles!user_follows_following_id_fkey (
+        id,
+        name,
+        avatar,
+        instagram_url
+      )
+    `)
+    .eq("follower_id", userId);
+    
+  return (data || []).map((row: any) => row.profiles as any);
+}

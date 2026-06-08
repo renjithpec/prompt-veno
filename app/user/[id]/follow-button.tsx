@@ -38,7 +38,7 @@ export function FollowButton({
   return (
     <Button 
       onClick={handleToggle} 
-      variant={isFollowing ? "secondary" : "primary"}
+      variant={isFollowing ? "secondary" : "default"}
       disabled={loading}
       className={isFollowing ? "border border-white/10" : "bg-accent text-black hover:bg-accent/90"}
     >
