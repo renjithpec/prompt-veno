@@ -142,12 +142,17 @@ export async function signUpWithEmail(formData: FormData) {
   if (!supabase) redirect("/login?error=Supabase%20is%20not%20configured");
 
   try {
+    const reqHeaders = await headers();
+    const host = reqHeaders.get("host") || "localhost:3000";
+    const protocol = host.includes("localhost") || host.match(/^\d{1,3}\.\d{1,3}/) ? "http" : "https";
+    const origin = `${protocol}://${host}`;
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: { full_name: name },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/callback`
+        emailRedirectTo: `${origin}/auth/callback`
       }
     });
 
