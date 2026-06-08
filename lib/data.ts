@@ -166,7 +166,7 @@ export async function getAdminStats() {
 }
 
 export async function getUserProfile(id: string): Promise<Profile | null> {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabaseAdminClient();
   if (!supabase) return null;
   const { data } = await supabase.from("profiles").select("*").eq("id", id).maybeSingle();
   return data;
