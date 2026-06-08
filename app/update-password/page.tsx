@@ -1,12 +1,19 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { updatePassword } from "@/app/actions/auth";
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/submit-button";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function UpdatePasswordPage() {
   const [state, formAction] = useActionState(updatePassword, null);
+
+  useEffect(() => {
+    // Initialize client-side Supabase to parse the URL hash fragment
+    // (access_token, refresh_token) and establish the session cookies automatically.
+    createSupabaseBrowserClient();
+  }, []);
 
   return (
     <section className="mx-auto grid min-h-[calc(100svh-64px)] max-w-md content-center px-4 py-12">
