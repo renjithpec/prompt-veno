@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getSettings } from "@/lib/data";
@@ -54,6 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <SiteHeader />
         <main>{children}</main>
         <SiteFooter settings={settings} />
+        <Analytics />
       </body>
     </html>
   );
