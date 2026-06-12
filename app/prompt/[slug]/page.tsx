@@ -44,7 +44,8 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
   const [prompt, settings] = await Promise.all([getPromptBySlug(slug), getSettings()]);
   if (!prompt) notFound();
   await trackPromptEvent(prompt.slug, "view");
-  const related = (await getPrompts({ category: prompt.category?.slug, limit: 3 })).filter((item) => item.id !== prompt.id);
+  const primaryCategorySlug = prompt.categories?.length ? prompt.categories[0].slug : prompt.category?.slug;
+  const related = (await getPrompts({ category: primaryCategorySlug, limit: 3 })).filter((item) => item.id !== prompt.id);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -84,7 +85,9 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
             <div className="absolute inset-0 bg-gradient-to-t from-background/75 via-transparent to-transparent" />
           </div>
           <div className="mt-6 flex flex-wrap gap-2">
-            <Link href={`/category/${prompt.category?.slug}`} className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">{prompt.category?.name}</Link>
+            {(prompt.categories?.length ? prompt.categories : prompt.category ? [prompt.category] : []).map((cat) => (
+              <Link key={cat.id} href={`/category/${cat.slug}`} className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">{cat.name}</Link>
+            ))}
             {prompt.tags.map((tag) => <Link key={tag.id} href={`/prompts?tag=${tag.slug}`} className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:text-accent hover:border-accent">{tag.name}</Link>)}
           </div>
           <h1 className="mt-5 text-4xl font-black leading-tight sm:text-5xl">{prompt.title}</h1>

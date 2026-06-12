@@ -6,6 +6,8 @@ import { getSettings } from "@/lib/data";
 import { absoluteUrl } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
+import { RewardPopup } from "@/components/reward-popup";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
@@ -51,6 +53,31 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSettings();
+  
+  const supabase = await createSupabaseServerClient();
+  let hasClaimedDaily = false;
+  let userId = null;
+  
+  if (supabase) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      userId = user.id;
+      const today = new Date();
+      today.setUTCHours(0, 0, 0, 0);
+      
+      const { data } = await supabase
+        .from("coin_transactions")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("reason", "Daily Check-in")
+        .gte("created_at", today.toISOString())
+        .limit(1);
+        
+      if (data && data.length > 0) {
+        hasClaimedDaily = true;
+      }
+    }
+  }
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -70,6 +97,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <SiteFooter settings={settings} />
             </div>
           </div>
+          <RewardPopup initialHasClaimed={hasClaimedDaily} userId={userId} />
           <Toaster position="bottom-center" />
         </ThemeProvider>
       </body>

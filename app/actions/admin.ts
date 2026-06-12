@@ -41,7 +41,7 @@ const promptSchema = z.object({
   description: z.string().trim().min(10).max(1000),
   prompt_content: z.string().trim().min(10).max(10000),
   preview_image: z.string().url(),
-  category_id: z.string().uuid("Invalid category"),
+  category_ids: z.string().min(1, "At least one category is required"),
   featured: z.coerce.boolean().default(false)
 });
 
@@ -53,19 +53,31 @@ export async function createPrompt(formData: FormData) {
       description: formData.get("description"),
       prompt_content: formData.get("prompt_content"),
       preview_image: formData.get("preview_image"),
-      category_id: formData.get("category_id"),
+      category_ids: formData.get("category_ids"),
       featured: formData.get("featured") === "on"
     });
     const { data: { user } } = await supabase.auth.getUser();
 
+    const { category_ids, ...promptData } = parsed;
+
     const { data: newPrompt, error: insertError } = await supabase.from("prompts").insert({ 
-      ...parsed, 
+      ...promptData, 
       slug: slugify(parsed.title),
       status: 'approved',
       user_id: user?.id 
     }).select("id, user_id").single();
     
     if (insertError) throw insertError;
+
+    const catIds = parsed.category_ids.split(",").filter(Boolean).slice(0, 3);
+    if (catIds.length > 0 && newPrompt) {
+      const promptCategories = catIds.map(catId => ({
+        prompt_id: newPrompt.id,
+        category_id: catId
+      }));
+      const { error: catError } = await supabase.from("prompt_categories").insert(promptCategories);
+      if (catError) console.error("Failed to insert categories:", catError);
+    }
     
     if (newPrompt && newPrompt.user_id) {
       await notifyFollowersNewPost(supabase, newPrompt.id, newPrompt.user_id);
@@ -92,7 +104,7 @@ export async function updatePrompt(formData: FormData) {
       description: formData.get("description"),
       prompt_content: formData.get("prompt_content"),
       preview_image: formData.get("preview_image"),
-      category_id: formData.get("category_id"),
+      category_ids: formData.get("category_ids"),
       featured: formData.get("featured") === "on"
     });
     
@@ -102,10 +114,26 @@ export async function updatePrompt(formData: FormData) {
     // Check current status
     const { data: currentPrompt } = await supabase.from("prompts").select("status, user_id").eq("id", id).single();
 
+    const { category_ids, ...promptData } = parsed;
+
     await supabase
       .from("prompts")
-      .update({ ...parsed, slug: nextSlug, status })
+      .update({ ...promptData, slug: nextSlug, status })
       .eq("id", id);
+      
+    // Handle categories (delete existing and insert new)
+    const { error: deleteCatsError } = await supabase.from("prompt_categories").delete().eq("prompt_id", id);
+    if (deleteCatsError) throw deleteCatsError;
+
+    const catIds = parsed.category_ids.split(",").filter(Boolean).slice(0, 3);
+    if (catIds.length > 0) {
+      const promptCategories = catIds.map(catId => ({
+        prompt_id: id,
+        category_id: catId
+      }));
+      const { error: catError } = await supabase.from("prompt_categories").insert(promptCategories);
+      if (catError) console.error("Failed to insert categories on edit:", catError);
+    }
       
     if (currentPrompt?.status !== "approved" && status === "approved" && currentPrompt?.user_id) {
       await notifyFollowersNewPost(supabase, id, currentPrompt.user_id);

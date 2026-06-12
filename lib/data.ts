@@ -3,13 +3,14 @@ import type { Category, Prompt, Settings, Tag, Profile } from "@/lib/types";
 import { categories as sampleCategories, prompts as samplePrompts, settings as sampleSettings, tags as sampleTags } from "@/lib/sample-data";
 import { createSupabaseAdminClient, createSupabaseServerClient, hasSupabaseEnv } from "@/lib/supabase/server";
 
-type PromptRow = Omit<Prompt, "category" | "tags" | "profiles"> & {
-  categories: Category | null;
-  prompt_tags: Array<{ tags: Tag | null }>;
+type PromptRow = Omit<Prompt, "categories" | "category" | "tags" | "profiles"> & {
+  prompt_categories?: Array<{ categories: Category | null }>;
+  prompt_tags?: Array<{ tags: Tag | null }>;
   profiles?: { name: string | null; avatar: string | null; is_verified?: boolean; follower_count?: number; instagram_url?: string | null } | null;
 };
 
 function normalizePrompt(row: PromptRow, isLiked: boolean = false, isDisliked: boolean = false, isSaved: boolean = false): Prompt {
+  const categoriesArray = row.prompt_categories?.map((item) => item.categories).filter(Boolean) as Category[] || [];
   return {
     ...row,
     likes_count: row.likes_count || 0,
@@ -19,8 +20,9 @@ function normalizePrompt(row: PromptRow, isLiked: boolean = false, isDisliked: b
     is_liked: isLiked,
     is_disliked: isDisliked,
     is_saved: isSaved,
-    category: row.categories || undefined,
-    tags: row.prompt_tags.map((item) => item.tags).filter(Boolean) as Tag[],
+    category: categoriesArray[0],
+    categories: categoriesArray,
+    tags: row.prompt_tags?.map((item) => item.tags).filter(Boolean) as Tag[] || [],
     profiles: row.profiles || null
   };
 }
@@ -42,8 +44,8 @@ function normalizeSettings(settings: Settings): Settings {
 function searchLocalPrompts(query?: string, category?: string, tag?: string, sort = "trending") {
   const needle = query?.trim().toLowerCase();
   const results = samplePrompts.filter((prompt) => {
-    const matchesQuery = !needle || [prompt.title, prompt.description, prompt.prompt_content, prompt.category?.name, ...prompt.tags.map((item) => item.name)].join(" ").toLowerCase().includes(needle);
-    const matchesCategory = !category || prompt.category?.slug === category;
+    const matchesQuery = !needle || [prompt.title, prompt.description, prompt.prompt_content, ...(prompt.categories?.map(c => c.name) || []), ...prompt.tags.map((item) => item.name)].join(" ").toLowerCase().includes(needle);
+    const matchesCategory = !category || prompt.categories?.some((c) => c.slug === category);
     const matchesTag = !tag || prompt.tags.some((item) => item.slug === tag);
     return matchesQuery && matchesCategory && matchesTag;
   });
@@ -98,13 +100,13 @@ export async function getPrompts(options: { query?: string; category?: string; t
 
   let query = supabase
     .from("prompts")
-    .select(options.category ? "*, categories!inner(*), prompt_tags(tags(*)), profiles!prompts_user_id_fkey(name, avatar, is_verified)" : "*, categories(*), prompt_tags(tags(*)), profiles!prompts_user_id_fkey(name, avatar, is_verified)");
+    .select(options.category ? "*, prompt_categories!inner(categories!inner(*)), prompt_tags(tags(*)), profiles!prompts_user_id_fkey(name, avatar, is_verified)" : "*, prompt_categories(categories(*)), prompt_tags(tags(*)), profiles!prompts_user_id_fkey(name, avatar, is_verified)");
 
   if (statusFilter !== "all") query = query.eq("status", statusFilter);
   if (options.user_id) query = query.eq("user_id", options.user_id);
   if (options.query) query = query.textSearch("search_vector", options.query, { type: "websearch" });
   if (options.featured) query = query.eq("featured", true);
-  if (options.category) query = query.eq("categories.slug", options.category);
+  if (options.category) query = query.eq("prompt_categories.categories.slug", options.category);
 
   if (options.savedOnly) {
     const { data: session } = await supabase.auth.getSession();
@@ -175,7 +177,7 @@ export async function getPromptBySlug(slug: string): Promise<Prompt | null> {
 
   const { data } = await supabase
     .from("prompts")
-    .select("*, categories(*), prompt_tags(tags(*)), profiles!prompts_user_id_fkey(name, avatar, is_verified, follower_count, instagram_url)")
+    .select("*, prompt_categories(categories(*)), prompt_tags(tags(*)), profiles!prompts_user_id_fkey(name, avatar, is_verified, follower_count, instagram_url)")
     .eq("slug", slug)
     .eq("status", "approved")
     .maybeSingle();
@@ -208,7 +210,7 @@ export async function getPromptById(id: string): Promise<Prompt | null> {
 
   const { data } = await supabase
     .from("prompts")
-    .select("*, categories(*), prompt_tags(tags(*)), profiles!prompts_user_id_fkey(name, avatar, is_verified, follower_count, instagram_url)")
+    .select("*, prompt_categories(categories(*)), prompt_tags(tags(*)), profiles!prompts_user_id_fkey(name, avatar, is_verified, follower_count, instagram_url)")
     .eq("id", id)
     .maybeSingle();
 

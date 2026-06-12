@@ -22,6 +22,7 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [coins, setCoins] = useState(0);
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -38,8 +39,9 @@ export function SiteHeader() {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (user && !userError) {
         setUser(user);
-        const { data } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+        const { data } = await supabase.from("profiles").select("role, coins").eq("id", user.id).single();
         setIsAdmin(data?.role === "admin");
+        setCoins(data?.coins || 0);
         
         // Fetch notifications
         const { data: notifs } = await supabase
@@ -53,6 +55,18 @@ export function SiteHeader() {
       setLoading(false);
     };
     fetchUser();
+    
+    // Listen for custom events to update coins (e.g. from RewardPopup)
+    const handleCoinsUpdated = (e: CustomEvent) => {
+      if (e.detail && typeof e.detail.amount === 'number') {
+        setCoins(prev => prev + e.detail.amount);
+      }
+    };
+    window.addEventListener('coins-updated', handleCoinsUpdated as EventListener);
+    
+    return () => {
+      window.removeEventListener('coins-updated', handleCoinsUpdated as EventListener);
+    };
   }, []);
 
   const handleSignOut = async () => {
@@ -112,6 +126,11 @@ export function SiteHeader() {
             <div className="flex w-full items-center gap-2 relative">
               <NotificationsDropdown initialNotifications={notifications} />
               
+              <Link href="/rewards" className="flex items-center justify-center gap-1.5 rounded-full border-2 border-border bg-foreground/[0.02] px-3 py-3 font-display text-sm font-black uppercase tracking-widest text-foreground dark:text-accent transition-all hover:border-accent hover:bg-foreground/[0.06] hover:shadow-[0_0_20px_rgba(214,255,127,0.2)]">
+                <Image src="/coin-asset.png" alt="Coins" width={20} height={20} className="h-5 w-5 animate-pulse drop-shadow-[0_0_8px_rgba(212,255,58,0.6)]" />
+                {coins}
+              </Link>
+              
               <div className="relative flex-1">
                 <button 
                   onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -138,6 +157,11 @@ export function SiteHeader() {
                         <p className="font-medium">Logged in as</p>
                         <p className="truncate text-xs text-muted-foreground">{user.email}</p>
                       </div>
+                      <div className="my-1 h-px bg-foreground/10" />
+                      <Link href="/rewards" onClick={() => setDropdownOpen(false)} className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground dark:text-accent transition hover:bg-accent/10">
+                        <Image src="/coin-asset.png" alt="Coins" width={16} height={16} className="h-4 w-4 drop-shadow-[0_0_8px_rgba(212,255,58,0.6)]" />
+                        {coins} Coins
+                      </Link>
                       <div className="my-1 h-px bg-foreground/10" />
                       <Link href="/saved" onClick={() => setDropdownOpen(false)} className="flex w-full cursor-pointer items-center rounded-md px-2 py-2 text-sm text-muted-foreground transition hover:bg-foreground/10 hover:text-foreground">
                         Saved Prompts
@@ -177,6 +201,12 @@ export function SiteHeader() {
           <Image src="/logo.svg" alt="Prompt Veno" width={436} height={136} priority className="h-10 w-auto" />
         </Link>
         <div className="flex items-center gap-2">
+          {user && (
+            <Link href="/rewards" className="flex h-10 items-center justify-center gap-1.5 rounded-lg border border-border bg-foreground/[0.02] px-3 font-display text-sm font-black uppercase tracking-widest text-foreground dark:text-accent transition-all hover:border-accent hover:bg-foreground/[0.06] shadow-lg backdrop-blur-md">
+              <Image src="/coin-asset.png" alt="Coins" width={16} height={16} className="h-4 w-4 drop-shadow-[0_0_8px_rgba(212,255,58,0.6)] animate-pulse" />
+              {coins}
+            </Link>
+          )}
           {user && <NotificationsDropdown initialNotifications={notifications} />}
           <button 
             aria-label="Open navigation" 
@@ -220,8 +250,12 @@ export function SiteHeader() {
               {user && (
                 <>
                   <div className="my-2 h-px w-full bg-foreground/10" />
+                  <Link href="/rewards" onClick={() => setOpen(false)} className="flex items-center gap-3 tap rounded-card px-3 py-3 font-display text-lg font-black uppercase text-foreground dark:text-accent hover:bg-foreground/[0.08]">
+                    <Image src="/coin-asset.png" alt="Coins" width={24} height={24} className="h-6 w-6 drop-shadow-[0_0_8px_rgba(212,255,58,0.6)]" />
+                    {coins} Coins
+                  </Link>
                   <Link href="/saved" onClick={() => setOpen(false)} className="tap rounded-card px-3 py-3 font-display text-lg font-black uppercase text-foreground hover:bg-foreground/[0.08]">Saved Prompts</Link>
-                  <Link href="/settings" onClick={() => setOpen(false)} className="tap rounded-card px-3 py-3 font-display text-lg font-black uppercase text-accent hover:bg-foreground/[0.08]">Account Settings</Link>
+                  <Link href="/settings" onClick={() => setOpen(false)} className="tap rounded-card px-3 py-3 font-display text-lg font-black uppercase text-foreground hover:bg-foreground/[0.08]">Account Settings</Link>
                   {isAdmin && <Link href="/admin" onClick={() => setOpen(false)} className="tap rounded-card px-3 py-3 font-display text-lg font-black uppercase text-purple-400 hover:bg-foreground/[0.08]">Admin Dashboard</Link>}
                 </>
               )}

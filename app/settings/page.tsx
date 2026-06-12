@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getPrompts } from "@/lib/data";
 import { SettingsClient } from "./settings-client";
 
 export const metadata = {
@@ -27,11 +28,7 @@ export default async function SettingsPage() {
     redirect("/login");
   }
 
-  const { data: userPrompts } = await supabase
-    .from("prompts")
-    .select("*, category:categories(name)")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+  const userPrompts = await getPrompts({ user_id: user.id, status: 'all' });
 
   return <SettingsClient user={user} profile={profile} userPrompts={userPrompts || []} />;
 }

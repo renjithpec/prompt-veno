@@ -28,8 +28,8 @@ export function MarketplaceClient({ prompts, categories, tags, initialQuery = ""
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
     return prompts
-      .filter((prompt) => !needle || [prompt.title, prompt.description, prompt.prompt_content, prompt.category?.name, ...prompt.tags.map((item) => item.name)].join(" ").toLowerCase().includes(needle))
-      .filter((prompt) => category === "all" || prompt.category?.slug === category)
+      .filter((prompt) => !needle || [prompt.title, prompt.description, prompt.prompt_content, ...(prompt.categories?.map(c => c.name) || []), ...prompt.tags.map((item) => item.name)].join(" ").toLowerCase().includes(needle))
+      .filter((prompt) => category === "all" || prompt.categories?.some(c => c.slug === category) || prompt.category?.slug === category)
       .filter((prompt) => tag === "all" || prompt.tags.some((item) => item.slug === tag))
       .sort((a, b) => {
         if (sort === "newest") return +new Date(b.created_at) - +new Date(a.created_at);

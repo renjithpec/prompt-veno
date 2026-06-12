@@ -1,5 +1,6 @@
 import { createPrompt } from "@/app/actions/admin";
 import { AdminPromptManager } from "@/components/admin-prompt-manager";
+import { AdminCategorySelect } from "@/components/admin-category-select";
 import { ImageUploadField } from "@/components/image-upload-field";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
@@ -15,9 +16,7 @@ export default async function AdminPromptsPage() {
         <Input name="title" placeholder="Prompt title" required />
         <Input name="description" placeholder="Description" required />
         <ImageUploadField />
-        <select name="category_id" className="tap rounded-card border border-border bg-foreground/5 px-4 text-sm text-foreground" required>
-          {categories.map((category) => <option key={category.id} value={category.id} className="bg-background text-foreground">{category.name}</option>)}
-        </select>
+        <AdminCategorySelect categories={categories} />
         <textarea name="prompt_content" placeholder="Prompt content" className="min-h-40 rounded-card border border-border bg-foreground/5 p-4 text-sm text-foreground outline-none focus:border-accent/60" required />
         <label className="flex items-center gap-2 text-sm text-muted-foreground"><input name="featured" type="checkbox" className="h-4 w-4 accent-lime-300" /> Featured</label>
         <SubmitButton loadingText="Saving...">Save Prompt</SubmitButton>

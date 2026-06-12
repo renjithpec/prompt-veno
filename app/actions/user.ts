@@ -22,7 +22,7 @@ const submitPromptSchema = z.object({
   title: z.string().min(3).max(100),
   description: z.string().min(10).max(500),
   prompt_content: z.string().min(10).max(5000),
-  category_id: z.string().uuid(),
+  category_ids: z.string().min(1, "At least one category is required"),
   tags: z.string()
 });
 
@@ -43,7 +43,7 @@ export async function submitPrompt(formData: FormData) {
       title: formData.get("title"),
       description: formData.get("description"),
       prompt_content: formData.get("prompt_content"),
-      category_id: formData.get("category_id"),
+      category_ids: formData.get("category_ids"),
       tags: formData.get("tags")
     });
     
@@ -68,7 +68,6 @@ export async function submitPrompt(formData: FormData) {
         description: result.data.description,
         prompt_content: result.data.prompt_content,
         preview_image: previewImage,
-        category_id: result.data.category_id,
         user_id: user.id
       })
       .select("id")
@@ -90,14 +89,27 @@ export async function submitPrompt(formData: FormData) {
       if (tagError) console.error("Failed to insert tags:", tagError);
     }
 
+    // 5. Handle categories
+    const catIds = result.data.category_ids.split(",").filter(Boolean).slice(0, 3);
+    if (catIds.length > 0) {
+      const promptCategories = catIds.map(catId => ({
+        prompt_id: prompt.id,
+        category_id: catId
+      }));
+      const { error: catError } = await supabase
+        .from("prompt_categories")
+        .insert(promptCategories);
+      
+      if (catError) console.error("Failed to insert categories:", catError);
+    }
+
     revalidatePath("/settings");
     revalidatePath("/admin");
+    return { success: true };
   } catch (error) {
     if (isRedirectError(error)) throw error;
     return { error: sanitizeError(error, "submitPrompt") };
   }
-  
-  redirect("/settings");
 }
 
 export async function editPrompt(promptId: string, formData: FormData) {
@@ -117,7 +129,7 @@ export async function editPrompt(promptId: string, formData: FormData) {
       title: formData.get("title"),
       description: formData.get("description"),
       prompt_content: formData.get("prompt_content"),
-      category_id: formData.get("category_id"),
+      category_ids: formData.get("category_ids"),
       tags: formData.get("tags")
     });
     
@@ -138,7 +150,6 @@ export async function editPrompt(promptId: string, formData: FormData) {
         description: result.data.description,
         prompt_content: result.data.prompt_content,
         preview_image: previewImage,
-        category_id: result.data.category_id,
         status: "pending" // Always revert to pending on edit
       })
       .eq("id", promptId)
@@ -165,6 +176,27 @@ export async function editPrompt(promptId: string, formData: FormData) {
         .insert(promptTags);
       
       if (tagError) console.error("Failed to insert tags on edit:", tagError);
+    }
+
+    // Handle categories (delete existing and insert new)
+    const { error: deleteCatsError } = await supabase
+      .from("prompt_categories")
+      .delete()
+      .eq("prompt_id", promptId);
+    
+    if (deleteCatsError) throw deleteCatsError;
+
+    const catIds = result.data.category_ids.split(",").filter(Boolean).slice(0, 3);
+    if (catIds.length > 0) {
+      const promptCategories = catIds.map(catId => ({
+        prompt_id: promptId,
+        category_id: catId
+      }));
+      const { error: catError } = await supabase
+        .from("prompt_categories")
+        .insert(promptCategories);
+      
+      if (catError) console.error("Failed to insert categories on edit:", catError);
     }
 
     revalidatePath("/settings");

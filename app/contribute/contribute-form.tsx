@@ -1,18 +1,42 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { editPrompt, submitPrompt } from "@/app/actions/user";
 import { ImageUploadField } from "@/components/image-upload-field";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import type { Category, Prompt } from "@/lib/types";
+import confetti from "canvas-confetti";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { CheckCircle2, ArrowRight } from "lucide-react";
 
 export function ContributeForm({ categories, initialData }: { categories: Category[], initialData?: Prompt }) {
-  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const router = useRouter();
+  const [status, setStatus] = useState<"idle" | "loading" | "error" | "success">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    initialData?.categories?.map(c => c.id) || 
+    (initialData?.category_id ? [initialData.category_id] : [])
+  );
+
+  const toggleCategory = (id: string) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(id)) return prev.filter(c => c !== id);
+      if (prev.length >= 3) return prev;
+      return [...prev, id];
+    });
+  };
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (selectedCategories.length === 0) {
+      setStatus("error");
+      setErrorMessage("Please select at least one category.");
+      return;
+    }
+    
     setStatus("loading");
     setErrorMessage("");
 
@@ -28,17 +52,25 @@ export function ContributeForm({ categories, initialData }: { categories: Catego
     if (result?.error) {
       setStatus("error");
       setErrorMessage(result.error + (result.details ? JSON.stringify(result.details) : ""));
+    } else {
+      if (initialData) {
+        // Edit success, just redirect
+        router.push("/settings");
+      } else {
+        // Submit success, show popper and popup
+        setStatus("success");
+        confetti({
+          particleCount: 150,
+          spread: 80,
+          origin: { y: 0.6 },
+          colors: ['#d4ff3a', '#ffffff', '#222222']
+        });
+      }
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="rounded-card border border-border bg-card p-6 shadow-2xl space-y-5">
-      {status === "error" && (
-        <div className="rounded bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20">
-          {errorMessage}
-        </div>
-      )}
-
       <div className="space-y-2">
         <label className="text-sm font-medium text-muted-foreground">Prompt Title</label>
         <Input name="title" defaultValue={initialData?.title} placeholder="e.g., Cinematic Product Commercial" className="bg-foreground/5 border-border text-foreground" required minLength={3} />
@@ -55,12 +87,34 @@ export function ContributeForm({ categories, initialData }: { categories: Catego
         <ImageUploadField name="preview_image" defaultValue={initialData?.preview_image || ""} />
       </div>
 
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-muted-foreground">Category</label>
-        <select name="category_id" defaultValue={initialData?.category?.id || ""} className="w-full tap rounded-card border border-border bg-foreground/5 px-4 h-11 text-sm text-foreground focus:border-accent outline-none" required>
-          <option value="" disabled>Select a category...</option>
-          {categories.map((category) => <option key={category.id} value={category.id} className="bg-background text-foreground">{category.name}</option>)}
-        </select>
+      <div className="space-y-3">
+        <label className="text-sm font-medium text-muted-foreground flex justify-between items-center">
+          <span>Categories (Select up to 3)</span>
+          <span className={`text-xs ${selectedCategories.length === 3 ? "text-accent font-bold" : "text-muted-foreground"}`}>{selectedCategories.length}/3</span>
+        </label>
+        <input type="hidden" name="category_ids" value={selectedCategories.join(",")} />
+        <div className="flex flex-wrap gap-2">
+          {categories.map((category) => {
+            const isSelected = selectedCategories.includes(category.id);
+            return (
+              <button
+                type="button"
+                key={category.id}
+                onClick={() => toggleCategory(category.id)}
+                className={`rounded-full border px-4 py-1.5 text-xs font-medium transition-all ${
+                  isSelected 
+                    ? "border-accent bg-accent/20 text-accent shadow-[0_0_10px_rgba(212,255,58,0.2)]" 
+                    : "border-border bg-foreground/5 text-muted-foreground hover:border-white/20 hover:text-foreground"
+                }`}
+              >
+                {category.name}
+              </button>
+            );
+          })}
+        </div>
+        {status === "error" && selectedCategories.length === 0 && (
+          <p className="text-xs text-destructive">Please select at least one category.</p>
+        )}
       </div>
       
       <div className="space-y-2">
@@ -74,10 +128,58 @@ export function ContributeForm({ categories, initialData }: { categories: Catego
       </div>
 
       <div className="pt-4">
-        <SubmitButton className="w-full" loadingText={initialData ? "Updating..." : "Submitting..."} disabled={status === "loading"}>
+        {status === "error" && (
+          <div className="rounded bg-destructive/10 p-3 text-sm text-destructive border border-destructive/20 mb-4">
+            {errorMessage}
+          </div>
+        )}
+
+        <SubmitButton className="w-full text-base h-12" loadingText={initialData ? "Updating..." : "Submitting..."} disabled={status === "loading"}>
           {initialData ? "Update Prompt" : "Submit for Review"}
         </SubmitButton>
       </div>
+
+      <AnimatePresence>
+        {status === "success" && !initialData && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            />
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
+              className="relative w-full max-w-md overflow-hidden rounded-3xl border border-border bg-panel shadow-2xl p-8 text-center"
+            >
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-accent/20">
+                <CheckCircle2 className="h-10 w-10 text-accent" />
+              </div>
+              
+              <h2 className="mb-4 font-display text-3xl font-black uppercase leading-tight tracking-tight text-white">
+                Prompt <span className="text-accent">Submitted!</span>
+              </h2>
+              
+              <p className="mb-8 text-sm leading-relaxed text-muted-foreground">
+                Congratulations! Your prompt has been sent to our moderation team. We'll verify it shortly, and you will be notified once it's approved. When approved, you will earn coins!
+              </p>
+              
+              <Button 
+                size="lg" 
+                onClick={() => router.push("/settings")}
+                className="w-full rounded-full bg-accent text-black font-display font-black uppercase tracking-widest hover:bg-accent/90 hover:shadow-[0_0_20px_rgba(212,255,58,0.5)] transition-all group"
+              >
+                Go to Settings
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </form>
   );
 }

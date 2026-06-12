@@ -34,8 +34,9 @@ export type Prompt = {
   description: string;
   prompt_content: string;
   preview_image: string;
-  category_id: string;
-  category?: Category;
+  category_id?: string; // Kept for backwards compatibility during transition
+  category?: Category; // Kept as an alias for categories[0] to reduce frontend breakages
+  categories: Category[];
   tags: Tag[];
   profiles?: {
     name: string | null;

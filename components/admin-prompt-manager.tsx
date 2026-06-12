@@ -10,6 +10,24 @@ import type { Category, Prompt } from "@/lib/types";
 
 export function AdminPromptManager({ prompts, categories }: { prompts: Prompt[]; categories: Category[] }) {
   const [openId, setOpenId] = useState<string | null>(null);
+  const [selectedCats, setSelectedCats] = useState<string[]>([]);
+
+  const handleOpen = (prompt: Prompt) => {
+    if (openId === prompt.id) {
+      setOpenId(null);
+    } else {
+      setOpenId(prompt.id);
+      setSelectedCats(prompt.categories?.map(c => c.id) || (prompt.category_id ? [prompt.category_id] : []));
+    }
+  };
+
+  const toggleCat = (id: string) => {
+    setSelectedCats(prev => {
+      if (prev.includes(id)) return prev.filter(c => c !== id);
+      if (prev.length >= 3) return prev;
+      return [...prev, id];
+    });
+  };
 
   return (
     <div className="mt-4 grid gap-3">
@@ -20,7 +38,7 @@ export function AdminPromptManager({ prompts, categories }: { prompts: Prompt[];
           <div key={prompt.id} className={`rounded-card border p-3 ${isOpen ? "border-accent/35" : "border-white/10"}`}>
             <button
               type="button"
-              onClick={() => setOpenId(isOpen ? null : prompt.id)}
+              onClick={() => handleOpen(prompt)}
               className="flex flex-col sm:flex-row w-full cursor-pointer items-start sm:items-center justify-between gap-3 text-left"
               aria-expanded={isOpen}
             >
@@ -70,11 +88,33 @@ export function AdminPromptManager({ prompts, categories }: { prompts: Prompt[];
                   <Input name="title" defaultValue={prompt.title} placeholder="Prompt title" required />
                   <Input name="description" defaultValue={prompt.description} placeholder="Description" required />
                   <ImageUploadField defaultValue={prompt.preview_image} />
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <select name="category_id" defaultValue={prompt.category_id} className="tap rounded-card border border-white/10 bg-white/5 px-4 text-sm text-white" required>
-                      {categories.map((category) => <option key={category.id} value={category.id} className="bg-black">{category.name}</option>)}
-                    </select>
-                    <select name="status" defaultValue={prompt.status || 'approved'} className="tap rounded-card border border-white/10 bg-white/5 px-4 text-sm text-white" required>
+                  <div className="grid gap-3">
+                    <div className="space-y-2">
+                      <label className="text-xs font-semibold text-white/50 uppercase tracking-wider flex justify-between">
+                        <span>Categories</span>
+                        <span>{selectedCats.length}/3</span>
+                      </label>
+                      <input type="hidden" name="category_ids" value={selectedCats.join(",")} />
+                      <div className="flex flex-wrap gap-2">
+                        {categories.map((category) => {
+                          const isSelected = selectedCats.includes(category.id);
+                          return (
+                            <button
+                              type="button"
+                              key={category.id}
+                              onClick={() => toggleCat(category.id)}
+                              className={`rounded border px-3 py-1 text-xs transition-all ${
+                                isSelected ? "border-accent bg-accent/20 text-accent" : "border-white/10 bg-white/5 text-white/50 hover:text-white"
+                              }`}
+                            >
+                              {category.name}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    
+                    <select name="status" defaultValue={prompt.status || 'approved'} className="tap rounded-card border border-white/10 bg-white/5 px-4 h-10 text-sm text-white" required>
                       <option value="pending" className="bg-black">Pending</option>
                       <option value="approved" className="bg-black">Approved</option>
                       <option value="rejected" className="bg-black">Rejected</option>

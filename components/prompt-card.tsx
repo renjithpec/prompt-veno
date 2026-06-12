@@ -16,7 +16,11 @@ export function PromptCard({ prompt }: { prompt: Prompt }) {
         <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
           <Image src={prompt.preview_image} alt={prompt.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition duration-500 group-hover:scale-105" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-          <div className="absolute bottom-3 left-3 rounded-full border border-border bg-black/55 px-3 py-1 text-xs text-accent backdrop-blur">{prompt.category?.name}</div>
+          <div className="absolute bottom-3 left-3 flex flex-wrap gap-2 pr-3">
+            {(prompt.categories?.length ? prompt.categories : prompt.category ? [prompt.category] : []).slice(0, 3).map((cat) => (
+              <div key={cat.id} className="rounded-full border border-border bg-black/55 px-3 py-1 text-[10px] sm:text-xs text-accent backdrop-blur">{cat.name}</div>
+            ))}
+          </div>
         </div>
       </Link>
       <div className="grid gap-4 p-4">
@@ -46,7 +50,7 @@ export function PromptCard({ prompt }: { prompt: Prompt }) {
             <Link key={tag.id} href={`/prompts?tag=${tag.slug}`} className="rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground hover:border-accent/50 hover:text-accent">{tag.name}</Link>
           ))}
         </div>
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-3 text-xs text-muted-foreground">
           <div className="flex items-center gap-3">
             <span className="inline-flex items-center gap-1"><Eye className="h-3.5 w-3.5" />{prompt.views.toLocaleString()}</span>
             <span className="inline-flex items-center gap-1"><Copy className="h-3.5 w-3.5" />{prompt.copies.toLocaleString()}</span>
