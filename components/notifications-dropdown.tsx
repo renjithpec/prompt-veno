@@ -122,7 +122,7 @@ export function NotificationsDropdown({ initialNotifications }: { initialNotific
         <div className="max-h-[400px] overflow-y-auto no-scrollbar">
           {notifications.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">
-              You don't have any notifications yet.
+              You don&apos;t have any notifications yet.
             </div>
           ) : (
             notifications.map((notification) => (
