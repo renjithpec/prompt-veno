@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient, createSupabaseAdminClient } from "@/lib/supabase/server";
 import { sanitizeError } from "@/lib/safe-action";
 
 export async function rewardUser(userId: string, amount: number, reason: string) {
@@ -71,11 +71,14 @@ export async function claimDailyReward() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Unauthorized");
 
+    const adminClient = createSupabaseAdminClient();
+    if (!adminClient) throw new Error("Database admin not configured");
+
     // Check if user already claimed today
     const today = new Date();
     today.setUTCHours(0, 0, 0, 0);
 
-    const { data: existingClaims, error: claimError } = await supabase
+    const { data: existingClaims, error: claimError } = await adminClient
       .from("coin_transactions")
       .select("id")
       .eq("user_id", user.id)
@@ -90,7 +93,7 @@ export async function claimDailyReward() {
     }
 
     // Insert transaction
-    const { error: txError } = await supabase
+    const { error: txError } = await adminClient
       .from("coin_transactions")
       .insert({
         user_id: user.id,
@@ -101,7 +104,7 @@ export async function claimDailyReward() {
     if (txError) throw txError;
 
     // Increment user's coins
-    const { data: targetProfile, error: profileError } = await supabase
+    const { data: targetProfile, error: profileError } = await adminClient
       .from("profiles")
       .select("coins")
       .eq("id", user.id)
@@ -111,7 +114,7 @@ export async function claimDailyReward() {
 
     const currentCoins = targetProfile?.coins || 0;
     
-    const { error: updateError } = await supabase
+    const { error: updateError } = await adminClient
       .from("profiles")
       .update({ coins: currentCoins + 10 })
       .eq("id", user.id);
