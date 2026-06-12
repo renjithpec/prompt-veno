@@ -148,7 +148,7 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
                 </Link>
                 <p className="truncate text-sm text-accent">{authorUsername}</p>
               </div>
-              <Button asChild variant="outline" size="sm" className="shrink-0 h-8 px-3 text-xs rounded-full border-accent/20 hover:bg-accent/10">
+              <Button asChild variant="secondary" size="sm" className="shrink-0 h-8 px-3 text-xs rounded-full border-accent/20 hover:bg-accent/10">
                 <Link href={prompt.user_id ? `/user/${prompt.user_id}` : "#"}>
                   View Profile
                 </Link>
