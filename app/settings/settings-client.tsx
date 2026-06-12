@@ -256,7 +256,7 @@ export function SettingsClient({ user, profile, userPrompts }: { user: User; pro
                       <p className="truncate text-xs text-muted-foreground">{prompt.category?.name}</p>
                     </div>
                   </div>
-                  <div className="flex w-full sm:w-auto shrink-0 items-center justify-between sm:justify-end gap-3 z-10 pl-17 sm:pl-0">
+                  <div className="flex w-full sm:w-auto shrink-0 items-center justify-between sm:justify-end gap-3 z-10 pl-16 sm:pl-0 flex-wrap">
                     <div className="flex shrink-0 items-center gap-1.5">
                       {prompt.status === 'pending' && <span className="flex items-center gap-1.5 rounded-full bg-yellow-500/10 px-2.5 py-1 text-xs font-medium text-yellow-400"><Clock className="h-3.5 w-3.5" /> Pending</span>}
                       {prompt.status === 'approved' && <span className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-green-400"><CheckCircle className="h-3.5 w-3.5" /> Approved</span>}
@@ -308,7 +308,7 @@ export function SettingsClient({ user, profile, userPrompts }: { user: User; pro
             </p>
             <div className="space-y-2">
               <label className="text-sm font-medium text-red-400">Type DELETE to confirm</label>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3 w-full">
                 <Input 
                   value={deleteConfirm}
                   onChange={(e) => setDeleteConfirm(e.target.value)}
