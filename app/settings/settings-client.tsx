@@ -111,9 +111,9 @@ export function SettingsClient({ user, profile, userPrompts }: { user: User; pro
                   <UserIcon className="h-full w-full p-4 text-muted-foreground" />
                 )}
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0 w-full">
                 <label className="text-sm font-medium text-muted-foreground">Profile Picture</label>
-                <div className="mt-2 max-w-sm">
+                <div className="mt-2 w-full sm:max-w-sm">
                   <ImageUploadField 
                     name="avatar" 
                     defaultValue={profile.avatar || ""} 
@@ -126,7 +126,7 @@ export function SettingsClient({ user, profile, userPrompts }: { user: User; pro
               </div>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2 w-full">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground">Display Name</label>
                 <Input 
@@ -149,7 +149,7 @@ export function SettingsClient({ user, profile, userPrompts }: { user: User; pro
               </div>
             </div>
             
-            <div className="space-y-2">
+            <div className="space-y-2 w-full">
               <label className="text-sm font-medium text-muted-foreground">Instagram URL (Optional)</label>
               <Input 
                 name="instagram_url"
@@ -181,7 +181,7 @@ export function SettingsClient({ user, profile, userPrompts }: { user: User; pro
             </div>
             
             <form onSubmit={handleUpdatePassword} className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2 w-full">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Current Password</label>
                   <Input 

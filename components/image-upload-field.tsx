@@ -87,7 +87,7 @@ export function ImageUploadField({
   };
 
   return (
-    <div className="grid gap-2">
+    <div className="grid gap-2 w-full">
       <Input name={name} value={url} onChange={(event) => setUrl(event.target.value)} placeholder={placeholder} required />
       <label className="tap flex cursor-pointer items-center justify-center gap-2 rounded-card border border-dashed border-white/15 bg-white/5 px-4 text-sm text-zinc-300 hover:border-accent/50 hover:text-accent">
         <ImageUp className="h-4 w-4" />
