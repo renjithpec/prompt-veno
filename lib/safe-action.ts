@@ -14,7 +14,9 @@ import { ZodError } from "zod";
 const SAFE_ERROR_PATTERNS: Array<{ pattern: RegExp; message: string }> = [
   { pattern: /duplicate key/i, message: "This item already exists." },
   { pattern: /violates foreign key/i, message: "This item is referenced by other data and cannot be modified." },
-  { pattern: /violates check constraint/i, message: "The provided data is invalid." }
+  { pattern: /violates check constraint/i, message: "The provided data is invalid." },
+  { pattern: /Unauthorized/i, message: "Unauthorized" },
+  { pattern: /Cannot follow yourself/i, message: "Cannot follow yourself" }
 ];
 
 /**
