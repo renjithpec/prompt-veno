@@ -165,7 +165,7 @@ export function ContributeForm({ categories, initialData }: { categories: Catego
               </h2>
               
               <p className="mb-8 text-sm leading-relaxed text-muted-foreground">
-                Congratulations! Your prompt has been sent to our moderation team. We'll verify it shortly, and you will be notified once it's approved. When approved, you will earn coins!
+                Congratulations! Your prompt has been sent to our moderation team. We&apos;ll verify it shortly, and you will be notified once it&apos;s approved. When approved, you will earn coins!
               </p>
               
               <Button 

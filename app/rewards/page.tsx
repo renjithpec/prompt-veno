@@ -63,7 +63,7 @@ export default async function RewardsPage() {
         {(!transactions || transactions.length === 0) ? (
           <div className="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed border-border rounded-xl">
             <Image src="/coin-asset.png" alt="No transactions" width={64} height={64} className="opacity-20 mb-4 grayscale" />
-            <p className="text-muted-foreground">You haven't earned any coins yet.</p>
+            <p className="text-muted-foreground">You haven&apos;t earned any coins yet.</p>
             <p className="text-sm text-muted-foreground mt-1">Submit your first prompt to start earning!</p>
           </div>
         ) : (

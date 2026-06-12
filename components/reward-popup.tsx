@@ -123,7 +123,7 @@ export function RewardPopup({ initialHasClaimed = false, userId }: { initialHasC
               <div className="flex w-full sm:w-1/2 flex-col justify-center px-8 pb-8 pt-2 sm:p-8 sm:pl-0 text-center sm:text-left">
                 <h2 className="font-display text-3xl sm:text-4xl font-black uppercase leading-tight tracking-tight text-white mb-4">
                   {hasClaimed ? (
-                    <>You're <span className="text-accent">All Set!</span></>
+                    <>You&apos;re <span className="text-accent">All Set!</span></>
                   ) : (
                     <>Daily <span className="text-accent">Check-In.</span></>
                   )}
