@@ -7,11 +7,11 @@ import { CopyPromptButton } from "@/components/copy-prompt-button";
 
 export function PromptCard({ prompt }: { prompt: Prompt }) {
   return (
-    <article className="group glass overflow-hidden rounded-card transition duration-300 hover:-translate-y-1 hover:border-accent/40 hover:shadow-glow">
+    <article className="group relative overflow-hidden rounded-card border-2 border-white/10 bg-[#0A0A0A] p-2 transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_rgba(214,255,127,0.3)]">
       <Link href={`/prompt/${prompt.slug}`} className="block">
-        <div className="relative aspect-[4/3] overflow-hidden">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
           <Image src={prompt.preview_image} alt={prompt.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover transition duration-500 group-hover:scale-105" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
           <div className="absolute bottom-3 left-3 rounded-full border border-white/10 bg-black/55 px-3 py-1 text-xs text-accent backdrop-blur">{prompt.category?.name}</div>
         </div>
       </Link>
@@ -34,7 +34,7 @@ export function PromptCard({ prompt }: { prompt: Prompt }) {
               </div>
             </Link>
           )}
-          <Link href={`/prompt/${prompt.slug}`} className="line-clamp-2 text-lg font-semibold text-white hover:text-accent">{prompt.title}</Link>
+          <Link href={`/prompt/${prompt.slug}`} className="line-clamp-2 font-display text-2xl font-black leading-tight text-white transition-colors group-hover:text-accent">{prompt.title}</Link>
           <p className="mt-2 line-clamp-2 text-sm leading-6 text-zinc-400">{prompt.description}</p>
         </div>
         <div className="flex flex-wrap gap-2">

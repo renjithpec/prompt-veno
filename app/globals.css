@@ -100,10 +100,11 @@ body {
   margin: 0;
   min-width: 320px;
   overflow-x: hidden;
-  background:
+  background-color: #050505;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E"),
     radial-gradient(circle at 15% 10%, rgba(214, 255, 127, 0.16), transparent 26rem),
-    radial-gradient(circle at 85% 30%, rgba(158, 240, 26, 0.09), transparent 24rem),
-    linear-gradient(180deg, #050505 0%, #090909 48%, #050505 100%);
+    radial-gradient(circle at 85% 30%, rgba(158, 240, 26, 0.09), transparent 24rem);
   color: #fff;
 }
 
@@ -113,9 +114,40 @@ body {
 }
 
 .glass {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: #090909;
   backdrop-filter: blur(20px);
+}
+
+.pill-badge {
+  background: linear-gradient(90deg, #D6FF7F, #9EF01A);
+  color: #050505;
+  padding: 0.5rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 20px rgba(184, 255, 79, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.neon-container {
+  background: linear-gradient(180deg, rgba(214, 255, 127, 0.15) 0%, rgba(5, 5, 5, 0) 100%);
+  border-radius: 40px;
+  border-top: 2px solid rgba(214, 255, 127, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.drawn-stroke {
+  stroke: #D6FF7F;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
 }
 
 .mesh {

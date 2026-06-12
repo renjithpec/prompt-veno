@@ -1,12 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Space_Grotesk, Caveat } from "next/font/google";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getSettings } from "@/lib/data";
 import { absoluteUrl } from "@/lib/utils";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], display: "swap" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-display", display: "swap" });
+const caveat = Caveat({ subsets: ["latin"], variable: "--font-hand", display: "swap" });
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -50,7 +52,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={inter.className} suppressHydrationWarning>
+      <body className={`${inter.variable} ${spaceGrotesk.variable} ${caveat.variable} font-sans`} suppressHydrationWarning>
         <SiteHeader />
         <main>{children}</main>
         <SiteFooter settings={settings} />

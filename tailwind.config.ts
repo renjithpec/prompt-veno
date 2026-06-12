@@ -24,7 +24,12 @@ const config: Config = {
         glow: "0 0 45px rgba(184,255,79,0.22)"
       },
       borderRadius: {
-        card: "8px"
+        card: "24px"
+      },
+      fontFamily: {
+        sans: ["var(--font-inter)", "sans-serif"],
+        display: ["var(--font-display)", "sans-serif"],
+        hand: ["var(--font-hand)", "cursive"]
       },
       keyframes: {
         "logo-spin": {
