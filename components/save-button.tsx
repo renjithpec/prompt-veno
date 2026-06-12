@@ -46,7 +46,7 @@ export function SaveButton({
       } else {
         toast.error("Failed to save");
       }
-    } else if (result) {
+    } else if (result && "saved" in result && typeof result.saved === "boolean") {
       setIsSaved(result.saved);
       if (result.saved) {
         toast.success("Prompt saved to your collection!");

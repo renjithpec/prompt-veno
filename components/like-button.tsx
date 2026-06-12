@@ -46,7 +46,7 @@ export function LikeButton({
       if (result.error.toLowerCase().includes("unauthorized")) {
         router.push("/auth/sign-in");
       }
-    } else if (result) {
+    } else if (result && "liked" in result && typeof result.liked === "boolean") {
       // Sync with server result just in case
       setIsLiked(result.liked);
     }

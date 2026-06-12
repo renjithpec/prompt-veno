@@ -46,7 +46,7 @@ export function DislikeButton({
       } else {
         toast.error("Failed to dislike");
       }
-    } else if (result) {
+    } else if (result && "disliked" in result && typeof result.disliked === "boolean") {
       setIsDisliked(result.disliked);
     }
     
