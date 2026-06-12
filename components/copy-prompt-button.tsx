@@ -43,7 +43,7 @@ export function CopyPromptButton({ prompt, compact = false }: { prompt: Prompt; 
       <AnimatePresence>
         {copied && (
           <motion.div
-            className="pointer-events-none absolute -top-12 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full border border-accent/30 bg-black px-3 py-2 text-xs font-semibold text-accent shadow-glow"
+            className="pointer-events-none absolute -top-12 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full border border-border bg-panel px-3 py-2 text-xs font-semibold text-foreground shadow-glow"
             initial={{ opacity: 0, y: 8, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.95 }}

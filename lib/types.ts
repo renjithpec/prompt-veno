@@ -48,6 +48,13 @@ export type Prompt = {
   featured: boolean;
   views: number;
   copies: number;
+  likes_count: number;
+  dislikes_count: number;
+  saves_count: number;
+  shares_count: number;
+  is_liked?: boolean;
+  is_disliked?: boolean;
+  is_saved?: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -61,4 +68,22 @@ export type Settings = {
   site_title: string;
   site_description: string;
   updated_at: string;
+};
+
+export type Notification = {
+  id: string;
+  user_id: string;
+  actor_id: string;
+  type: 'like' | 'follow' | 'new_post';
+  prompt_id: string | null;
+  is_read: boolean;
+  created_at: string;
+  actor?: {
+    name: string | null;
+    avatar: string | null;
+  };
+  prompt?: {
+    title: string;
+    slug: string;
+  };
 };

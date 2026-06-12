@@ -11,13 +11,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#050505",
-        panel: "#090909",
-        panel2: "#0D0D0D",
+        background: "hsl(var(--background) / <alpha-value>)",
+        foreground: "hsl(var(--foreground) / <alpha-value>)",
+        panel: "hsl(var(--panel) / <alpha-value>)",
+        panel2: "hsl(var(--panel2) / <alpha-value>)",
+        border: "hsl(var(--border) / <alpha-value>)",
+        muted: "hsl(var(--muted) / <alpha-value>)",
         accent: {
-          DEFAULT: "#D6FF7F",
-          bright: "#B8FF4F",
-          deep: "#9EF01A"
+          DEFAULT: "hsl(var(--accent) / <alpha-value>)",
         }
       },
       boxShadow: {

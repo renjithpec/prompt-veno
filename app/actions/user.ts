@@ -309,3 +309,166 @@ export async function deleteAccount() {
     return { error: sanitizeError(error, "deleteAccount") };
   }
 }
+
+export async function toggleLike(promptId: string) {
+  try {
+    const reqHeaders = await headers();
+    const ip = getClientIp(reqHeaders);
+    const rl = rateLimit(`toggle-like:${ip}`, 30, 60000); // 30 likes per minute max
+    if (!rl.allowed) throw new Error("Too many requests.");
+
+    const supabase = await createSupabaseServerClient();
+    if (!supabase) throw new Error("Database not configured");
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Unauthorized");
+
+    // Check if liked
+    const { data: existingLike } = await supabase
+      .from("prompts_likes")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("prompt_id", promptId)
+      .maybeSingle();
+
+    if (existingLike) {
+      await supabase
+        .from("prompts_likes")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("prompt_id", promptId);
+      return { success: true, liked: false };
+    } else {
+      await supabase
+        .from("prompts_likes")
+        .insert({ user_id: user.id, prompt_id: promptId });
+
+      // If they like, we should remove their dislike if it exists
+      await supabase.from("prompts_dislikes").delete().eq("user_id", user.id).eq("prompt_id", promptId);
+
+      return { success: true, liked: true };
+    }
+  } catch (error) {
+    return { error: sanitizeError(error, "toggleLike") };
+  }
+}
+
+export async function toggleDislike(promptId: string) {
+  try {
+    const reqHeaders = await headers();
+    const ip = getClientIp(reqHeaders);
+    const rl = rateLimit(`toggle-dislike:${ip}`, 30, 60000);
+    if (!rl.allowed) throw new Error("Too many requests.");
+
+    const supabase = await createSupabaseServerClient();
+    if (!supabase) throw new Error("Database not configured");
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Unauthorized");
+
+    // Check if disliked
+    const { data: existingDislike } = await supabase
+      .from("prompts_dislikes")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("prompt_id", promptId)
+      .maybeSingle();
+
+    if (existingDislike) {
+      await supabase
+        .from("prompts_dislikes")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("prompt_id", promptId);
+      return { success: true, disliked: false };
+    } else {
+      await supabase
+        .from("prompts_dislikes")
+        .insert({ user_id: user.id, prompt_id: promptId });
+      
+      // If they dislike, we should remove their like if it exists
+      await supabase.from("prompts_likes").delete().eq("user_id", user.id).eq("prompt_id", promptId);
+
+      return { success: true, disliked: true };
+    }
+  } catch (error) {
+    return { error: sanitizeError(error, "toggleDislike") };
+  }
+}
+
+export async function toggleSave(promptId: string) {
+  try {
+    const reqHeaders = await headers();
+    const ip = getClientIp(reqHeaders);
+    const rl = rateLimit(`toggle-save:${ip}`, 30, 60000);
+    if (!rl.allowed) throw new Error("Too many requests.");
+
+    const supabase = await createSupabaseServerClient();
+    if (!supabase) throw new Error("Database not configured");
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Unauthorized");
+
+    // Check if saved
+    const { data: existingSave } = await supabase
+      .from("prompts_saves")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("prompt_id", promptId)
+      .maybeSingle();
+
+    if (existingSave) {
+      await supabase
+        .from("prompts_saves")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("prompt_id", promptId);
+      return { success: true, saved: false };
+    } else {
+      await supabase
+        .from("prompts_saves")
+        .insert({ user_id: user.id, prompt_id: promptId });
+      return { success: true, saved: true };
+    }
+  } catch (error) {
+    return { error: sanitizeError(error, "toggleSave") };
+  }
+}
+
+export async function trackShare(promptId: string) {
+  try {
+    const reqHeaders = await headers();
+    const ip = getClientIp(reqHeaders);
+    const rl = rateLimit(`track-share:${ip}`, 30, 60000);
+    if (!rl.allowed) return { success: false };
+
+    const supabase = await createSupabaseServerClient();
+    if (!supabase) return { success: false };
+
+    await supabase.rpc('increment_prompt_shares', { prompt_id: promptId });
+    return { success: true };
+  } catch (error) {
+    return { success: false };
+  }
+}
+
+export async function markNotificationsAsRead() {
+  try {
+    const supabase = await createSupabaseServerClient();
+    if (!supabase) return { success: false };
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return { success: false };
+
+    await supabase
+      .from("notifications")
+      .update({ is_read: true })
+      .eq("user_id", user.id)
+      .eq("is_read", false);
+
+    return { success: true };
+  } catch (error) {
+    return { error: sanitizeError(error, "markNotificationsAsRead") };
+  }
+}
+

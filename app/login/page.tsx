@@ -74,7 +74,7 @@ export default function LoginPage() {
             <Input name="email" type="email" autoComplete="email" placeholder="Email" required />
             <div className="flex flex-col gap-1">
               <Input name="password" type="password" autoComplete="current-password" placeholder="Password" required />
-              <Link href="/reset-password" className="text-right text-xs font-semibold text-zinc-400 hover:text-white transition-colors">
+              <Link href="/reset-password" className="text-right text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors">
                 Forgot password?
               </Link>
             </div>
@@ -97,8 +97,8 @@ export default function LoginPage() {
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-white/10" />
           </div>
-          <div className="relative flex justify-center">
-            <span className="bg-[#0a0a0a] px-3 text-xs text-zinc-500">or continue with</span>
+          <div className="relative mb-6 flex items-center justify-center border-t border-border mt-6">
+            <span className="bg-panel2 px-3 text-xs text-muted-foreground">or continue with</span>
           </div>
         </div>
 

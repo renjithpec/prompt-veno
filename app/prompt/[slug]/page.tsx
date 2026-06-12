@@ -5,6 +5,10 @@ import { Calendar, Copy, Eye, Instagram, BadgeCheck } from "lucide-react";
 import { notFound } from "next/navigation";
 import { CopyPromptButton } from "@/components/copy-prompt-button";
 import { PromptCard } from "@/components/prompt-card";
+import { LikeButton } from "@/components/like-button";
+import { DislikeButton } from "@/components/dislike-button";
+import { ShareButton } from "@/components/share-button";
+import { SaveButton } from "@/components/save-button";
 import { Button } from "@/components/ui/button";
 import { getPromptBySlug, getPrompts, getSettings, trackPromptEvent, checkIsFollowing } from "@/lib/data";
 import { absoluteUrl } from "@/lib/utils";
@@ -66,7 +70,7 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
   }
 
   const authorName = prompt.profiles?.name || settings.creator_name;
-  const authorAvatar = prompt.profiles?.avatar || "/placeholder.jpg";
+  const authorAvatar = prompt.profiles?.avatar || "/logo-icon.svg";
   const authorUsername = prompt.profiles?.name ? `@${prompt.profiles.name.toLowerCase().replace(/[^a-z0-9]/g, "")}` : settings.instagram_username;
   const authorInstagram = prompt.profiles?.instagram_url || settings.instagram_url;
 
@@ -75,27 +79,55 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="grid gap-8 lg:grid-cols-[1fr_390px]">
         <div className="min-w-0">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-card border border-white/10 sm:aspect-[16/9]">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-card border border-border sm:aspect-[16/9]">
             <Image src={prompt.preview_image} alt={prompt.title} fill priority sizes="(max-width: 1024px) 100vw, 760px" className="object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/75 via-transparent to-transparent" />
           </div>
           <div className="mt-6 flex flex-wrap gap-2">
-            <Link href={`/category/${prompt.category?.slug}`} className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-black">{prompt.category?.name}</Link>
-            {prompt.tags.map((tag) => <Link key={tag.id} href={`/prompts?tag=${tag.slug}`} className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-300 hover:text-accent">{tag.name}</Link>)}
+            <Link href={`/category/${prompt.category?.slug}`} className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-accent-foreground">{prompt.category?.name}</Link>
+            {prompt.tags.map((tag) => <Link key={tag.id} href={`/prompts?tag=${tag.slug}`} className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:text-accent hover:border-accent">{tag.name}</Link>)}
           </div>
           <h1 className="mt-5 text-4xl font-black leading-tight sm:text-5xl">{prompt.title}</h1>
-          <p className="mt-4 max-w-3xl text-lg leading-8 text-zinc-300">{prompt.description}</p>
-          <div className="mt-5 flex flex-wrap gap-4 text-sm text-zinc-400">
+          <p className="mt-4 max-w-3xl text-lg leading-8 text-foreground">{prompt.description}</p>
+          <div className="mt-5 flex flex-wrap gap-4 text-sm text-muted-foreground items-center">
             <span className="inline-flex items-center gap-2"><Eye className="h-4 w-4 text-accent" />{prompt.views.toLocaleString()} views</span>
             <span className="inline-flex items-center gap-2"><Copy className="h-4 w-4 text-accent" />{prompt.copies.toLocaleString()} copies</span>
-            <span className="inline-flex items-center gap-2"><Calendar className="h-4 w-4 text-accent" />{new Date(prompt.created_at).toLocaleDateString()}</span>
+            <span className="inline-flex items-center gap-2 border-l border-border pl-4">
+              <LikeButton 
+                promptId={prompt.id} 
+                initialLikes={prompt.likes_count || 0} 
+                initialIsLiked={!!prompt.is_liked}
+                showText 
+              />
+              <DislikeButton 
+                promptId={prompt.id} 
+                initialDislikes={prompt.dislikes_count || 0} 
+                initialIsDisliked={!!prompt.is_disliked}
+                showText 
+              />
+            </span>
+            <span className="inline-flex items-center gap-2 border-l border-border pl-4">
+              <ShareButton 
+                promptId={prompt.id} 
+                promptSlug={prompt.slug}
+                initialShares={prompt.shares_count || 0}
+                showText 
+              />
+              <SaveButton 
+                promptId={prompt.id} 
+                initialSaves={prompt.saves_count || 0} 
+                initialIsSaved={!!prompt.is_saved}
+                showText 
+              />
+            </span>
+            <span className="inline-flex items-center gap-2 border-l border-border pl-4"><Calendar className="h-4 w-4 text-accent" />{new Date(prompt.created_at).toLocaleDateString()}</span>
           </div>
           <section className="glass mt-8 rounded-card p-4 sm:p-6">
             <div className="mb-4 flex items-center justify-between gap-4">
               <h2 className="text-xl font-bold">Prompt Content</h2>
               <div className="hidden sm:block"><CopyPromptButton prompt={prompt} compact /></div>
             </div>
-            <pre className="max-h-[460px] overflow-auto whitespace-pre-wrap rounded-card border border-white/10 bg-black/45 p-4 text-sm leading-7 text-zinc-200">{prompt.prompt_content}</pre>
+            <pre className="max-h-[460px] overflow-auto whitespace-pre-wrap rounded-card border border-border bg-panel p-4 text-sm leading-7 text-foreground">{prompt.prompt_content}</pre>
             <div className="mt-4 sm:hidden"><CopyPromptButton prompt={prompt} /></div>
           </section>
         </div>
@@ -114,7 +146,7 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
                 <p className="truncate text-sm text-accent">{authorUsername}</p>
               </div>
             </div>
-            <p className="mt-4 text-sm leading-6 text-zinc-300">Follow me on Instagram for more premium prompts and daily AI content.</p>
+            <p className="mt-4 text-sm leading-6 text-muted-foreground">Follow me on Instagram for more premium prompts and daily AI content.</p>
             <div className="mt-5 grid gap-3">
               {!isSelf && prompt.user_id && (
                 <FollowButton userId={prompt.user_id} initialIsFollowing={isFollowing} />

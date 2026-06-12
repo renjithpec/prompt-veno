@@ -38,18 +38,18 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
       <div className="mb-12 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-8">
         
         {/* Avatar */}
-        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/5 sm:h-36 sm:w-36">
+        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border border-border bg-foreground/5 sm:h-36 sm:w-36">
           {profile.avatar ? (
             <Image src={profile.avatar} alt={profile.name || "User"} fill className="object-cover" />
           ) : (
-            <UserIcon className="h-full w-full p-6 text-zinc-500 sm:p-8" />
+            <UserIcon className="h-full w-full p-6 text-muted-foreground sm:p-8" />
           )}
         </div>
         
         {/* User Info & Stats */}
         <div className="flex w-full flex-col items-center sm:items-start sm:flex-1">
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-6 mb-4">
-            <h1 className="flex items-center gap-2 text-2xl font-bold text-white sm:text-3xl">
+            <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground sm:text-3xl">
               {profile.name || "Anonymous"}
               {(profile.is_verified || profile.follower_count >= 1000) && (
                 <BadgeCheck className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
@@ -67,8 +67,8 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
           {/* Stats Row */}
           <div className="flex justify-center gap-8 sm:justify-start mb-6">
             <div className="text-center sm:text-left">
-              <span className="text-xl font-bold text-white">{prompts.length}</span>
-              <p className="text-sm text-zinc-400">prompts</p>
+              <span className="text-xl font-bold text-foreground">{prompts.length}</span>
+              <p className="text-sm text-muted-foreground">prompts</p>
             </div>
             <UserListModal 
               title="Followers" 
@@ -94,9 +94,9 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
       </div>
 
       <div className="space-y-6">
-        <h2 className="text-xl font-semibold text-white border-b border-white/10 pb-4">Prompts</h2>
+        <h2 className="text-xl font-semibold text-foreground border-b border-border pb-4">Prompts</h2>
         {prompts.length === 0 ? (
-          <div className="rounded-card border border-dashed border-white/10 bg-white/5 p-12 text-center text-zinc-400">
+          <div className="rounded-card border border-dashed border-border bg-foreground/5 p-12 text-center text-muted-foreground">
             This user hasn&apos;t contributed any approved prompts yet.
           </div>
         ) : (

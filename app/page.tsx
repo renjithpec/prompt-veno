@@ -4,22 +4,20 @@ import { AnimatedShell } from "@/components/animated-shell";
 import { AnimatedLink } from "@/components/animated-link";
 import { Button } from "@/components/ui/button";
 import { PromptCard } from "@/components/prompt-card";
-import { getCategories, getPrompts } from "@/lib/data";
+import { getCategories, getPrompts, getPublicStats } from "@/lib/data";
 
 export default async function HomePage() {
-  const [featured, categories, trending] = await Promise.all([
+  const [featured, categories, trending, publicStats] = await Promise.all([
     getPrompts({ featured: true, limit: 3 }),
     getCategories(),
-    getPrompts({ sort: "trending", limit: 6 })
+    getPrompts({ sort: "trending", limit: 6 }),
+    getPublicStats()
   ]);
-
-  const copies = trending.reduce((total, prompt) => total + prompt.copies, 0);
-  const views = trending.reduce((total, prompt) => total + prompt.views, 0);
 
   return (
     <>
-      <section className="relative overflow-hidden pt-12 lg:pt-24 pb-16">
-        <div className="absolute right-[10%] top-[20%] hidden md:block opacity-80 rotate-12">
+      <section className="relative overflow-hidden pt-6 lg:pt-12 pb-16">
+        <div className="absolute right-[10%] top-[10%] hidden md:block opacity-80 rotate-12">
           <svg width="120" height="120" viewBox="0 0 100 100" className="drawn-stroke text-accent">
             <path d="M 30,40 Q 35,30 40,40" />
             <path d="M 60,40 Q 65,30 70,40" />
@@ -29,7 +27,7 @@ export default async function HomePage() {
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 relative z-10 flex flex-col items-center text-center">
           
-          <Link href="/contribute" className="mb-10 group relative inline-flex items-center gap-2 rounded-full bg-accent px-6 py-2.5 text-sm font-black uppercase tracking-wider text-black transition-transform hover:scale-105 hover:shadow-[0_0_30px_rgba(214,255,127,0.5)]">
+          <Link href="/contribute" className="mb-6 group relative inline-flex items-center gap-2 rounded-full bg-accent px-6 py-2.5 text-sm font-black uppercase tracking-wider text-black transition-transform hover:scale-105 hover:shadow-[0_0_30px_rgba(214,255,127,0.5)]">
             Contribute Prompt
             <ArrowRight className="h-4 w-4 rotate-45" />
           </Link>
@@ -59,7 +57,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <p className="mx-auto mt-8 max-w-2xl text-pretty text-lg font-medium text-zinc-300">
+            <p className="mx-auto mt-8 max-w-2xl text-pretty text-lg font-medium text-muted-foreground">
               Discover premium AI prompts for Veo 3, ChatGPT, Flux, Midjourney, Kling, and Instagram creators.
             </p>
 
@@ -81,7 +79,7 @@ export default async function HomePage() {
             {trending.map((prompt) => <PromptCard key={prompt.id} prompt={prompt} />)}
           </div>
 
-          <div className="mt-16 mb-8 flex items-end justify-between gap-4 border-t border-white/10 pt-16">
+          <div className="mt-16 mb-8 flex items-end justify-between gap-4 border-t border-border pt-16">
             <div>
               <h2 className="font-display text-3xl font-black uppercase">Categories</h2>
             </div>
@@ -90,9 +88,9 @@ export default async function HomePage() {
           
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {categories.map((category) => (
-              <Link key={category.id} href={`/category/${category.slug}`} className="group relative overflow-hidden rounded-card border-2 border-white/10 bg-[#0A0A0A] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_rgba(214,255,127,0.2)]">
-                <div className="font-display text-2xl font-black uppercase text-white group-hover:text-accent">{category.name}</div>
-                <p className="mt-2 text-sm leading-6 text-zinc-400">{category.description}</p>
+              <Link key={category.id} href={`/category/${category.slug}`} className="group relative overflow-hidden rounded-card border-2 border-border bg-panel2 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-[0_0_30px_rgba(214,255,127,0.2)]">
+                <div className="font-display text-2xl font-black uppercase text-foreground group-hover:text-accent">{category.name}</div>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{category.description}</p>
               </Link>
             ))}
           </div>
@@ -102,14 +100,14 @@ export default async function HomePage() {
 
       <section className="mx-auto grid max-w-7xl gap-4 px-4 py-10 sm:px-6 sm:grid-cols-3">
         {[
-          { label: "Prompts Available", value: `${trending.length * 100}+`, icon: Search },
-          { label: "Copies Made", value: copies.toLocaleString(), icon: Copy },
-          { label: "Active Users", value: Math.max(4200, Math.round(views / 10)).toLocaleString(), icon: Users }
+          { label: "Prompts Available", value: publicStats.promptCount.toLocaleString(), icon: Search },
+          { label: "Copies Made", value: publicStats.copies.toLocaleString(), icon: Copy },
+          { label: "Total Views", value: publicStats.views.toLocaleString(), icon: Eye }
         ].map((stat) => (
           <AnimatedShell key={stat.label} className="glass rounded-card p-6 flex flex-col items-center text-center">
             <stat.icon className="h-8 w-8 text-accent mb-4" />
             <div className="font-display text-4xl font-black">{stat.value}</div>
-            <div className="mt-2 text-sm font-bold uppercase tracking-wider text-zinc-400">{stat.label}</div>
+            <div className="mt-2 text-sm font-bold uppercase tracking-wider text-muted-foreground">{stat.label}</div>
           </AnimatedShell>
         ))}
       </section>

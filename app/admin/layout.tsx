@@ -23,7 +23,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <p className="text-sm font-semibold text-accent">Admin</p>
           <h1 className="text-3xl font-black">Prompt Veno Dashboard</h1>
         </div>
-        <nav className="flex max-w-full gap-2 overflow-x-auto no-scrollbar">
+        <nav className="flex max-w-full flex-wrap gap-2">
           {[
             ["/admin", "Overview"],
             ["/admin/prompts", "Prompts"],

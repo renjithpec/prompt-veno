@@ -58,18 +58,18 @@ export function MarketplaceClient({ prompts, categories, tags, initialQuery = ""
       {isPending && (
         <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm transition-all">
           <LogoSpinner className="h-24 w-24" />
-          <p className="mt-6 text-sm font-medium tracking-wide text-zinc-300 animate-pulse">
+          <p className="mt-6 text-sm font-medium tracking-wide text-foreground animate-pulse">
             Loading...
           </p>
         </div>
       )}
       <div className="grid gap-6">
-        <div className="sticky top-[64px] z-40 bg-[#050505]/95 backdrop-blur-xl border-y border-white/5 py-4 -mx-4 px-4 sm:mx-0 sm:px-4 sm:rounded-card sm:border sm:bg-white/[0.02]">
+        <div className="sticky top-[64px] z-40 bg-background/80 backdrop-blur-xl border-y border-border py-4 -mx-4 px-4 sm:mx-0 sm:px-4 sm:rounded-card sm:border sm:bg-foreground/[0.02]">
           <div className="flex flex-col gap-3">
             {/* Search Input and Mobile Filter Toggle */}
             <div className="flex gap-2 w-full">
               <label className="relative flex-1">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search viral prompts" className="pl-10" />
               </label>
               <Button 
@@ -113,14 +113,14 @@ export function MarketplaceClient({ prompts, categories, tags, initialQuery = ""
         {suggestions.length > 0 && (
           <div className="mt-3 flex gap-2 overflow-x-auto pb-1 no-scrollbar">
             {suggestions.map((prompt) => (
-              <button key={prompt.id} onClick={() => setQuery(prompt.title)} className="tap shrink-0 rounded-full border border-white/10 px-3 text-xs text-zinc-300 hover:border-accent/50 hover:text-accent">
+              <button key={prompt.id} onClick={() => setQuery(prompt.title)} className="tap shrink-0 rounded-full border border-border px-3 text-xs text-muted-foreground hover:border-accent/50 hover:text-accent">
                 {prompt.title}
               </button>
             ))}
           </div>
         )}
       </div>
-      <div className="flex items-center justify-between text-sm text-zinc-400">
+      <div className="flex items-center justify-between text-sm text-muted-foreground">
         <span>{filtered.length} prompts found</span>
         <span>No horizontal scroll</span>
       </div>

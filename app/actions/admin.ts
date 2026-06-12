@@ -17,6 +17,25 @@ async function assertAdmin() {
   return adminClient;
 }
 
+async function notifyFollowersNewPost(supabase: any, promptId: string, authorId: string) {
+  // Fetch followers
+  const { data: followers } = await supabase
+    .from("user_follows")
+    .select("follower_id")
+    .eq("following_id", authorId);
+
+  if (followers && followers.length > 0) {
+    const notifications = followers.map((f: any) => ({
+      user_id: f.follower_id,
+      actor_id: authorId,
+      type: "new_post",
+      prompt_id: promptId
+    }));
+    await supabase.from("notifications").insert(notifications);
+  }
+}
+
+
 const promptSchema = z.object({
   title: z.string().trim().min(3).max(200),
   description: z.string().trim().min(10).max(1000),
@@ -39,12 +58,18 @@ export async function createPrompt(formData: FormData) {
     });
     const { data: { user } } = await supabase.auth.getUser();
 
-    await supabase.from("prompts").insert({ 
+    const { data: newPrompt, error: insertError } = await supabase.from("prompts").insert({ 
       ...parsed, 
       slug: slugify(parsed.title),
       status: 'approved',
       user_id: user?.id 
-    });
+    }).select("id, user_id").single();
+    
+    if (insertError) throw insertError;
+    
+    if (newPrompt && newPrompt.user_id) {
+      await notifyFollowersNewPost(supabase, newPrompt.id, newPrompt.user_id);
+    }
     revalidatePath("/");
     revalidatePath("/prompts");
   } catch (error: unknown) {
@@ -74,10 +99,17 @@ export async function updatePrompt(formData: FormData) {
     const status = String(formData.get("status") || "approved");
     const nextSlug = slugify(parsed.title);
 
+    // Check current status
+    const { data: currentPrompt } = await supabase.from("prompts").select("status, user_id").eq("id", id).single();
+
     await supabase
       .from("prompts")
       .update({ ...parsed, slug: nextSlug, status })
       .eq("id", id);
+      
+    if (currentPrompt?.status !== "approved" && status === "approved" && currentPrompt?.user_id) {
+      await notifyFollowersNewPost(supabase, id, currentPrompt.user_id);
+    }
 
     revalidatePath("/");
     revalidatePath("/prompts");
@@ -99,10 +131,16 @@ export async function moderatePrompt(formData: FormData) {
       throw new Error("Invalid status or ID");
     }
 
+    const { data: currentPrompt } = await supabase.from("prompts").select("status, user_id").eq("id", id).single();
+
     await supabase
       .from("prompts")
       .update({ status })
       .eq("id", id);
+
+    if (currentPrompt?.status !== "approved" && status === "approved" && currentPrompt?.user_id) {
+      await notifyFollowersNewPost(supabase, id, currentPrompt.user_id);
+    }
 
     revalidatePath("/admin");
     revalidatePath("/prompts");
