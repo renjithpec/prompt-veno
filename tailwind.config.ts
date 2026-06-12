@@ -39,11 +39,18 @@ const config: Config = {
         },
         shimmer: {
           "100%": { transform: "translateX(100%)" }
+        },
+        blob: {
+          "0%": { transform: "translate(0px, 0px) scale(1)" },
+          "33%": { transform: "translate(30px, -50px) scale(1.1)" },
+          "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
+          "100%": { transform: "translate(0px, 0px) scale(1)" }
         }
       },
       animation: {
         "logo-spin": "logo-spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite",
-        shimmer: "shimmer 2s infinite"
+        shimmer: "shimmer 2s infinite",
+        blob: "blob 7s infinite"
       }
     }
   },
