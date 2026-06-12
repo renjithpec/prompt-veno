@@ -171,7 +171,7 @@ export function RewardPopup({ initialHasClaimed = false, userId }: { initialHasC
                   )}
                   {hasClaimed && (
                     <Button 
-                      variant="outline"
+                      variant="secondary"
                       size="lg" 
                       onClick={handleClose}
                       className="w-full rounded-full font-display font-black uppercase tracking-widest"
