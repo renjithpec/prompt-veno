@@ -13,7 +13,7 @@ import { NotificationsDropdown } from "@/components/notifications-dropdown";
 const navLinks = [
   { href: "/", label: "Home", icon: Home },
   { href: "/prompts", label: "Prompts", icon: Search },
-  { href: "/category/veo3", label: "Categories", icon: LayoutGrid },
+  { href: "/categories", label: "Categories", icon: LayoutGrid },
   { href: "/messages", label: "Messages", icon: MessageSquare },
   { href: "/ranks", label: "Ranks", icon: Trophy },
   { href: "/about", label: "About", icon: Info }
