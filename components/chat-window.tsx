@@ -37,19 +37,9 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
   const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState("");
-  const [showTerms, setShowTerms] = useState(false);
+  const [showTerms, setShowTerms] = useState(true);
   const [agreed, setAgreed] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Check if user has already agreed to terms
-    if (typeof window !== 'undefined') {
-      const hasAgreed = localStorage.getItem("chat_terms_agreed");
-      if (!hasAgreed) {
-        setShowTerms(true);
-      }
-    }
-  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -270,7 +260,7 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
     <div className="flex flex-col h-full bg-background relative z-0">
       {/* Terms & Conditions Modal */}
       <Dialog open={showTerms} onOpenChange={(open) => {
-        if (!open && localStorage.getItem("chat_terms_agreed") === "true") {
+        if (!open && agreed) {
           setShowTerms(false);
         }
       }}>
@@ -317,10 +307,7 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
               type="button" 
               className="w-full sm:w-auto font-bold uppercase tracking-wider"
               disabled={!agreed}
-              onClick={() => {
-                localStorage.setItem("chat_terms_agreed", "true");
-                setShowTerms(false);
-              }}
+              onClick={() => setShowTerms(false)}
             >
               Enter Chat
             </Button>
