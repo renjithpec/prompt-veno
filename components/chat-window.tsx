@@ -275,7 +275,7 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
               Chat Zone Rules
             </DialogTitle>
             <DialogDescription className="text-base text-foreground/80 mt-2">
-              Before you enter, you must agree to our community guidelines.
+              Before you enter, you must agree to our community guidelines. <strong className="text-accent block mt-1">✨ You earn 1 coin for every message you send!</strong>
             </DialogDescription>
           </DialogHeader>
           <div className="py-4 space-y-4 text-sm font-medium">
@@ -291,6 +291,10 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
               <p className="flex gap-2">
                 <span className="text-accent font-bold">3.</span> 
                 <span><strong>Moderation active.</strong> Admins will remove users who violate these terms without warning.</span>
+              </p>
+              <p className="flex gap-2">
+                <span className="text-accent font-bold">4.</span> 
+                <span><strong>Earn rewards.</strong> You will be credited with 1 coin for each active message you send in the chat.</span>
               </p>
             </div>
             
