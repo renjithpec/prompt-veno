@@ -1,7 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { LeaderboardClient } from "./leaderboard-client";
 
-export const revalidate = 60; // Revalidate every minute
+export const dynamic = "force-dynamic";
 
 export default async function RanksPage() {
   const supabase = await createSupabaseServerClient();

@@ -8,6 +8,8 @@ import { getCategories, getPrompts, getPublicStats } from "@/lib/data";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { TopThreePodium } from "@/components/top-three-podium";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const [featured, categories, trending, publicStats] = await Promise.all([
     getPrompts({ featured: true, limit: 3 }),
