@@ -35,7 +35,7 @@ export function LikeButton({
     const handleReaction = (e: any) => {
       if (e.detail.promptId === promptId && e.detail.type === "dislike" && isLiked) {
         setIsLiked(false);
-        setLikes(prev => prev - 1);
+        setLikes(prev => Math.max(0, prev - 1));
       }
     };
     window.addEventListener("reaction-update", handleReaction);
@@ -51,7 +51,7 @@ export function LikeButton({
     // Optimistic update
     const newIsLiked = !isLiked;
     setIsLiked(newIsLiked);
-    setLikes(prev => newIsLiked ? prev + 1 : prev - 1);
+    setLikes(prev => newIsLiked ? prev + 1 : Math.max(0, prev - 1));
 
     // Tell the dislike button to turn off optimistically
     if (newIsLiked) {
@@ -63,7 +63,7 @@ export function LikeButton({
     // If not authenticated or error, revert
     if (result?.error) {
       setIsLiked(!newIsLiked);
-      setLikes(prev => !newIsLiked ? prev + 1 : prev - 1);
+      setLikes(prev => !newIsLiked ? prev + 1 : Math.max(0, prev - 1));
       
       // If error is related to auth, redirect to login
       if (result.error.toLowerCase().includes("unauthorized")) {

@@ -36,7 +36,7 @@ export function DislikeButton({
     const handleReaction = (e: any) => {
       if (e.detail.promptId === promptId && e.detail.type === "like" && isDisliked) {
         setIsDisliked(false);
-        setDislikes(prev => prev - 1);
+        setDislikes(prev => Math.max(0, prev - 1));
       }
     };
     window.addEventListener("reaction-update", handleReaction);
@@ -52,7 +52,7 @@ export function DislikeButton({
     // Optimistic update
     const newIsDisliked = !isDisliked;
     setIsDisliked(newIsDisliked);
-    setDislikes(prev => newIsDisliked ? prev + 1 : prev - 1);
+    setDislikes(prev => newIsDisliked ? prev + 1 : Math.max(0, prev - 1));
 
     // Tell the like button to turn off optimistically
     if (newIsDisliked) {
@@ -63,7 +63,7 @@ export function DislikeButton({
     
     if (result?.error) {
       setIsDisliked(!newIsDisliked);
-      setDislikes(prev => !newIsDisliked ? prev + 1 : prev - 1);
+      setDislikes(prev => !newIsDisliked ? prev + 1 : Math.max(0, prev - 1));
       
       if (result.error.toLowerCase().includes("unauthorized")) {
         router.push("/login");
