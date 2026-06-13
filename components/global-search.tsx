@@ -33,6 +33,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
       setQuery("");
       setResults({ profiles: [], prompts: [] });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   useEffect(() => {
