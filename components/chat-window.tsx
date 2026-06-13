@@ -43,7 +43,28 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
   const [showTerms, setShowTerms] = useState(true);
   const [agreed, setAgreed] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [typingUsers, setTypingUsers] = useState<Record<string, {name: string, timestamp: number}>>({});
+  const channelRef = useRef<any>(null);
+  const lastTypedRef = useRef<number>(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setTypingUsers(prev => {
+        let changed = false;
+        const next = { ...prev };
+        Object.keys(next).forEach(id => {
+          if (now - next[id].timestamp > 3000) {
+            delete next[id];
+            changed = true;
+          }
+        });
+        return changed ? next : prev;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -107,6 +128,20 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
       channel = supabase
         .channel(channelName)
         .on(
+          'broadcast',
+          { event: 'typing' },
+          (payload: any) => {
+            const { userId: typerId, name } = payload.payload;
+            if (user && typerId !== user.id) {
+              setTypingUsers(prev => ({
+                ...prev,
+                [typerId]: { name, timestamp: Date.now() }
+              }));
+              setTimeout(scrollToBottom, 50);
+            }
+          }
+        )
+        .on(
           'postgres_changes',
           { event: 'INSERT', schema: 'public', table: 'public_messages', filter: `room_id=eq.${room.id}` },
           async (payload: any) => {
@@ -139,6 +174,8 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
           }
         )
         .subscribe();
+        
+      channelRef.current = channel;
     };
 
     setupChat();
@@ -147,6 +184,7 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
       if (channel) {
         supabase?.removeChannel(channel);
       }
+      channelRef.current = null;
     };
   }, [room.id]);
 
@@ -500,6 +538,26 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
             );
           })
         )}
+        
+        {/* Typing Indicator */}
+        {Object.keys(typingUsers).length > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            exit={{ opacity: 0 }}
+            className="flex items-center gap-2 mb-2 px-2 text-muted-foreground w-full justify-start"
+          >
+            <div className="flex items-center gap-1 bg-panel border border-border/50 px-3 py-2.5 rounded-2xl shadow-sm rounded-tl-sm">
+              <span className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+              <span className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+              <span className="w-1.5 h-1.5 bg-accent rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+            </div>
+            <span className="text-xs font-medium">
+              {Object.values(typingUsers).map(u => u.name).join(', ')} {Object.keys(typingUsers).length === 1 ? 'is' : 'are'} typing...
+            </span>
+          </motion.div>
+        )}
+        
         <div ref={messagesEndRef} />
       </div>
 
@@ -509,7 +567,20 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
           <input
             type="text"
             value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
+            onChange={(e) => {
+              setNewMessage(e.target.value);
+              if (userId && userProfile && channelRef.current) {
+                const now = Date.now();
+                if (now - lastTypedRef.current > 1500) {
+                  channelRef.current.send({
+                    type: 'broadcast',
+                    event: 'typing',
+                    payload: { userId, name: userProfile.name || 'Anonymous' }
+                  }).catch(console.error);
+                  lastTypedRef.current = now;
+                }
+              }
+            }}
             placeholder={userId ? `Message #${room.name}...` : "Sign in to chat..."}
             disabled={!userId}
             className="w-full bg-panel border-2 border-border/50 rounded-full pl-6 pr-14 py-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-accent transition-colors disabled:opacity-50"
