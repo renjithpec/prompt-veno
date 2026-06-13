@@ -143,6 +143,20 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
           }
         )
         .on(
+          'broadcast',
+          { event: 'new_message' },
+          (payload: any) => {
+            const newMsg = payload.payload.message;
+            if (newMsg && user && newMsg.user_id !== user.id) {
+              setMessages(current => {
+                if (current.some(m => m.id === newMsg.id)) return current;
+                return [...current, newMsg];
+              });
+              setTimeout(scrollToBottom, 100);
+            }
+          }
+        )
+        .on(
           'postgres_changes',
           { event: 'INSERT', schema: 'public', table: 'public_messages', filter: `room_id=eq.${room.id}` },
           async (payload: any) => {
@@ -155,7 +169,10 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
               .single();
             
             const completeMessage = { ...newMsg, profiles: profileData || null };
-            setMessages((current) => [...current, completeMessage]);
+            setMessages((current) => {
+              if (current.some(m => m.id === completeMessage.id)) return current;
+              return [...current, completeMessage];
+            });
             setTimeout(scrollToBottom, 100);
           }
         )
@@ -226,6 +243,16 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
       toast.error(`Failed to send: ${error.message}`);
       setMessages(current => current.filter(m => m.id !== messageId));
     } else {
+      // Instantly broadcast the message to everyone else in the room for smooth UX
+      // This guarantees real-time delivery even if Supabase table replication is delayed or disabled
+      if (channelRef.current) {
+        channelRef.current.send({
+          type: 'broadcast',
+          event: 'new_message',
+          payload: { message: optimisticMsg }
+        }).catch(console.error);
+      }
+
       // Reward 1 coin for participating in the chat
       rewardForChat().then((res) => {
         if (res?.success) {
