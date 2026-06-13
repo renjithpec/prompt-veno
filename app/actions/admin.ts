@@ -305,17 +305,8 @@ export async function adminDeleteChatMessage(messageId: string, authorId: string
     const { error: delError } = await adminClient.from("public_messages").delete().eq("id", messageId);
     if (delError) throw delError;
 
-    // Deduct coin from author
-    const { data: profile } = await adminClient.from("profiles").select("coins").eq("id", authorId).single();
-    if (profile) {
-      const newCoins = Math.max(0, (profile.coins || 0) - 1);
-      await adminClient.from("profiles").update({ coins: newCoins }).eq("id", authorId);
-      await adminClient.from("coin_transactions").insert({
-        user_id: authorId,
-        amount: -1,
-        reason: "Message Deleted by Admin"
-      });
-    }
+    // We do NOT deduct coins when an admin deletes someone else's message.
+    // The regular delete flow (when a user deletes their own message) handles self-deductions.
 
     return { success: true };
   } catch (error) {
