@@ -183,6 +183,17 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
   };
 
   const handleDeleteMessage = async (messageId: string) => {
+    // Check if message is older than 60 minutes
+    const msg = messages.find(m => m.id === messageId);
+    if (msg) {
+      const messageAgeMs = new Date().getTime() - new Date(msg.created_at).getTime();
+      if (messageAgeMs >= 60 * 60 * 1000) {
+        toast.error("Messages cannot be deleted after 1 hour.");
+        setMessageToDelete(null);
+        return;
+      }
+    }
+
     // Optimistic delete
     setMessages(current => current.filter(m => m.id !== messageId));
 
@@ -308,6 +319,7 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
             const showHeader = index === 0 || messages[index - 1].user_id !== msg.user_id;
             const messageAgeMs = new Date().getTime() - new Date(msg.created_at).getTime();
             const canEdit = isMe && messageAgeMs < 30 * 60 * 1000;
+            const canDelete = isMe && messageAgeMs < 60 * 60 * 1000;
 
             return (
               <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
@@ -343,13 +355,15 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
                       )}
-                      <button 
-                        onClick={() => setMessageToDelete(msg.id)}
-                        className="p-1.5 text-red-500 hover:bg-red-500/10 rounded-full transition-all"
-                        title="Delete message"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                      {canDelete && (
+                        <button 
+                          onClick={() => setMessageToDelete(msg.id)}
+                          className="p-1.5 text-red-500 hover:bg-red-500/10 rounded-full transition-all"
+                          title="Delete message"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   )}
                   
