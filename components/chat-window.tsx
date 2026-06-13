@@ -315,7 +315,7 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
                     </span>
                   </div>
                 )}
-                <div className={`flex items-center gap-2 group`}>
+                <div className={`flex items-center gap-2 group w-full ${isMe ? 'justify-end' : 'justify-start'}`}>
                   {isMe && editingMessageId !== msg.id && (
                     <div className="opacity-0 group-hover:opacity-100 flex items-center transition-all order-1">
                       <button 

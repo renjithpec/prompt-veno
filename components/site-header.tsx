@@ -240,7 +240,7 @@ export function SiteHeader() {
               <Image src="/logo.svg" alt="Prompt Veno" width={436} height={136} className="h-12 w-auto" />
               <Button aria-label="Close navigation" size="icon" variant="ghost" onClick={() => setOpen(false)}><X className="h-5 w-5" /></Button>
             </div>
-            <div className="mt-8 grid gap-2">
+            <div className="mt-8 flex-1 overflow-y-auto no-scrollbar grid content-start gap-2 pb-6">
               {navLinks.map((link) => (
                 <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className="flex items-center gap-3 tap rounded-card px-3 py-3 font-display text-lg font-black uppercase text-foreground hover:bg-foreground/[0.08]">
                   <link.icon className="h-5 w-5" />
