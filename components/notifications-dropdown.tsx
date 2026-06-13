@@ -198,7 +198,8 @@ export function NotificationsDropdown({ initialNotifications }: { initialNotific
                   )}
                 </Link>
               </DropdownMenuItem>
-            ))
+              );
+            })
           )}
         </div>
       </DropdownMenuContent>
