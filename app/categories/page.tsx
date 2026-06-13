@@ -14,7 +14,7 @@ export default async function CategoriesPage() {
             All Categories
           </h1>
           <p className="text-muted-foreground mt-4 font-medium max-w-2xl mx-auto">
-            Browse our entire collection of prompt categories to find exactly what you're looking for.
+            Browse our entire collection of prompt categories to find exactly what you&apos;re looking for.
           </p>
         </div>
 
