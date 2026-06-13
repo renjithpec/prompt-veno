@@ -82,7 +82,7 @@ export function SiteHeader() {
 
   return (
     <>
-    <header className="fixed top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-2xl md:bottom-4 md:left-4 md:top-4 md:w-[80px] xl:w-[250px] md:rounded-[32px] md:border-2 md:border-border md:bg-panel2/70 md:shadow-[0_0_40px_rgba(0,0,0,0.2)] transition-all duration-300 overflow-visible">
+    <header className="fixed top-0 z-[100] w-full border-b border-border bg-background/80 backdrop-blur-2xl md:bottom-4 md:left-4 md:top-4 md:w-[80px] xl:w-[250px] md:rounded-[32px] md:border-2 md:border-border md:bg-panel2/70 md:shadow-[0_0_40px_rgba(0,0,0,0.2)] transition-all duration-300 overflow-visible">
       
       {/* Desktop Sidebar Layout */}
       <div className="hidden h-full flex-col px-2 xl:px-4 py-6 xl:py-8 md:flex">
