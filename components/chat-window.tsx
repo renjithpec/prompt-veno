@@ -274,7 +274,7 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
           setShowTerms(false);
         }
       }}>
-        <DialogContent className="sm:max-w-md [&>button]:hidden" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+        <DialogContent className="w-[92vw] max-w-md rounded-2xl sm:max-w-md [&>button]:hidden p-6 sm:p-8" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle className="font-display font-black text-2xl uppercase tracking-wider text-accent flex items-center gap-2">
               Chat Zone Rules
