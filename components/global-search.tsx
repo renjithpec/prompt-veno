@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Search, Loader2, User, FileText, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { searchGlobal } from "@/app/actions/search";
+import { searchGlobal, getDefaultSearchSuggestions } from "@/app/actions/search";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface SearchResult {
@@ -22,6 +22,13 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
   useEffect(() => {
     if (open) {
       setTimeout(() => inputRef.current?.focus(), 100);
+      if (query.trim().length < 2) {
+        setLoading(true);
+        getDefaultSearchSuggestions().then(res => {
+          setResults(res);
+          setLoading(false);
+        });
+      }
     } else {
       setQuery("");
       setResults({ profiles: [], prompts: [] });
@@ -50,7 +57,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl p-0 gap-0 overflow-hidden bg-background border-border rounded-2xl [&>button]:hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+      <DialogContent className="sm:max-w-xl w-[95vw] sm:w-full !top-16 sm:!top-24 !translate-y-0 p-0 gap-0 overflow-hidden bg-background border-border rounded-2xl [&>button]:hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]">
         <div className="flex items-center px-4 py-3 border-b border-border bg-panel2">
           <Search className="w-5 h-5 text-muted-foreground shrink-0" />
           <input
@@ -69,12 +76,6 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
         </div>
 
         <div className="max-h-[60vh] overflow-y-auto p-2 no-scrollbar">
-          {query.trim().length < 2 && (
-            <div className="p-8 text-center text-muted-foreground text-sm">
-              Type at least 2 characters to search.
-            </div>
-          )}
-
           {query.trim().length >= 2 && !loading && results.profiles.length === 0 && results.prompts.length === 0 && (
             <div className="p-8 text-center text-muted-foreground text-sm">
               No results found for &quot;{query}&quot;.
@@ -84,7 +85,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
           {results.profiles.length > 0 && (
             <div className="mb-4">
               <div className="px-3 py-2 text-xs font-black tracking-widest uppercase text-muted-foreground font-display">
-                Creators
+                {query.trim().length < 2 ? "Top Creators" : "Creators"}
               </div>
               <div className="flex flex-col gap-1">
                 {results.profiles.map(profile => {
@@ -119,7 +120,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
           {results.prompts.length > 0 && (
             <div>
               <div className="px-3 py-2 text-xs font-black tracking-widest uppercase text-muted-foreground font-display">
-                Prompts
+                {query.trim().length < 2 ? "Trending Prompts" : "Prompts"}
               </div>
               <div className="flex flex-col gap-1">
                 {results.prompts.map(prompt => (
