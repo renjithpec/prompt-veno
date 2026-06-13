@@ -290,23 +290,21 @@ export function SiteHeader() {
                   <Link href="/saved" onClick={() => setOpen(false)} className="tap rounded-card px-3 py-3 font-display text-lg font-black uppercase text-foreground hover:bg-foreground/[0.08]">Saved Prompts</Link>
                   <Link href="/settings" onClick={() => setOpen(false)} className="tap rounded-card px-3 py-3 font-display text-lg font-black uppercase text-foreground hover:bg-foreground/[0.08]">Account Settings</Link>
                   {isAdmin && <Link href="/admin" onClick={() => setOpen(false)} className="tap rounded-card px-3 py-3 font-display text-lg font-black uppercase text-purple-400 hover:bg-foreground/[0.08]">Admin Dashboard</Link>}
+                  <div className="my-2 h-px w-full bg-foreground/10" />
+                  <button onClick={handleSignOut} className="tap rounded-card px-3 py-3 font-display text-lg font-black uppercase text-red-500 text-left hover:bg-red-500/10">Sign Out</button>
                 </>
               )}
             </div>
-            <div className="mt-auto grid gap-3">
-              {user ? (
-                <Button variant="danger" size="lg" className="rounded-full font-display font-black uppercase" onClick={handleSignOut}>Sign Out</Button>
-              ) : (
-                <>
-                  <Button asChild variant="secondary" size="lg" className="rounded-full font-display font-black uppercase">
-                    <Link href="/login" onClick={() => setOpen(false)}>Sign in for free</Link>
-                  </Button>
-                  <Button asChild size="lg" className="rounded-full font-display font-black uppercase">
-                    <Link href="/prompts" onClick={() => setOpen(false)}>Get Started</Link>
-                  </Button>
-                </>
-              )}
-            </div>
+            {!user && (
+              <div className="mt-auto grid gap-3 shrink-0 pt-4 border-t border-border/50">
+                <Button asChild variant="secondary" size="lg" className="rounded-full font-display font-black uppercase">
+                  <Link href="/login" onClick={() => setOpen(false)}>Sign in for free</Link>
+                </Button>
+                <Button asChild size="lg" className="rounded-full font-display font-black uppercase bg-accent text-black hover:bg-accent/80">
+                  <Link href="/prompts" onClick={() => setOpen(false)}>Get Started</Link>
+                </Button>
+              </div>
+            )}
           </motion.div>
         </motion.div>
       )}
