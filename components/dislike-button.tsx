@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ThumbsDown } from "lucide-react";
 import { toggleDislike } from "@/app/actions/user";
 import { cn } from "@/lib/utils";
@@ -25,15 +25,39 @@ export function DislikeButton({
   const [isPending, setIsPending] = useState(false);
   const router = useRouter();
 
+  // Sync state if props change from server
+  useEffect(() => {
+    setDislikes(initialDislikes);
+    setIsDisliked(initialIsDisliked);
+  }, [initialDislikes, initialIsDisliked]);
+
+  // Listen for like events on the same prompt to clear the dislike state instantly
+  useEffect(() => {
+    const handleReaction = (e: any) => {
+      if (e.detail.promptId === promptId && e.detail.type === "like" && isDisliked) {
+        setIsDisliked(false);
+        setDislikes(prev => prev - 1);
+      }
+    };
+    window.addEventListener("reaction-update", handleReaction);
+    return () => window.removeEventListener("reaction-update", handleReaction);
+  }, [promptId, isDisliked]);
+
   const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     
     if (isPending) return;
     setIsPending(true);
 
+    // Optimistic update
     const newIsDisliked = !isDisliked;
     setIsDisliked(newIsDisliked);
     setDislikes(prev => newIsDisliked ? prev + 1 : prev - 1);
+
+    // Tell the like button to turn off optimistically
+    if (newIsDisliked) {
+      window.dispatchEvent(new CustomEvent("reaction-update", { detail: { promptId, type: "dislike" } }));
+    }
 
     const result = await toggleDislike(promptId);
     
@@ -47,7 +71,9 @@ export function DislikeButton({
         toast.error("Failed to dislike");
       }
     } else if (result && "disliked" in result && typeof result.disliked === "boolean") {
+      // Sync with server result just in case
       setIsDisliked(result.disliked);
+      router.refresh(); // Refresh to pull updated stats from server
     }
     
     setIsPending(false);

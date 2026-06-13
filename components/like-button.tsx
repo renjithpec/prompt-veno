@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Heart } from "lucide-react";
 import { toggleLike } from "@/app/actions/user";
 import { cn } from "@/lib/utils";
@@ -24,6 +24,24 @@ export function LikeButton({
   const [isPending, setIsPending] = useState(false);
   const router = useRouter();
 
+  // Sync state if props change from server
+  useEffect(() => {
+    setLikes(initialLikes);
+    setIsLiked(initialIsLiked);
+  }, [initialLikes, initialIsLiked]);
+
+  // Listen for dislike events on the same prompt to clear the like state instantly
+  useEffect(() => {
+    const handleReaction = (e: any) => {
+      if (e.detail.promptId === promptId && e.detail.type === "dislike" && isLiked) {
+        setIsLiked(false);
+        setLikes(prev => prev - 1);
+      }
+    };
+    window.addEventListener("reaction-update", handleReaction);
+    return () => window.removeEventListener("reaction-update", handleReaction);
+  }, [promptId, isLiked]);
+
   const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault(); // Prevent navigating if inside a Link
     
@@ -34,6 +52,11 @@ export function LikeButton({
     const newIsLiked = !isLiked;
     setIsLiked(newIsLiked);
     setLikes(prev => newIsLiked ? prev + 1 : prev - 1);
+
+    // Tell the dislike button to turn off optimistically
+    if (newIsLiked) {
+      window.dispatchEvent(new CustomEvent("reaction-update", { detail: { promptId, type: "like" } }));
+    }
 
     const result = await toggleLike(promptId);
     
@@ -49,6 +72,7 @@ export function LikeButton({
     } else if (result && "liked" in result && typeof result.liked === "boolean") {
       // Sync with server result just in case
       setIsLiked(result.liked);
+      router.refresh(); // Refresh to pull updated stats from server
     }
     
     setIsPending(false);
