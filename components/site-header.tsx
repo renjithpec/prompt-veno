@@ -173,7 +173,7 @@ export function SiteHeader() {
                       animate={{ opacity: 1, x: 0, scale: 1 }} 
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute bottom-full left-0 xl:left-auto xl:top-auto xl:bottom-0 xl:left-full z-50 mb-2 xl:mb-0 xl:ml-2 w-56 overflow-hidden rounded-card border border-border bg-panel p-1 shadow-2xl backdrop-blur-xl"
+                      className="absolute bottom-full left-0 xl:left-auto xl:top-auto xl:bottom-0 xl:left-full z-[150] mb-2 xl:mb-0 xl:ml-2 w-56 overflow-hidden rounded-card border border-border bg-panel p-1 shadow-2xl backdrop-blur-xl"
                     >
                       <div className="px-2 py-2.5 text-sm text-foreground">
                         <p className="font-medium">Logged in as</p>
