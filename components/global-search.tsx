@@ -77,7 +77,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
 
           {query.trim().length >= 2 && !loading && results.profiles.length === 0 && results.prompts.length === 0 && (
             <div className="p-8 text-center text-muted-foreground text-sm">
-              No results found for "{query}".
+              No results found for &quot;{query}&quot;.
             </div>
           )}
 
