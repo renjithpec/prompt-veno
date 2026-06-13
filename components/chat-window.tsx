@@ -185,7 +185,11 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
       setMessages(current => current.filter(m => m.id !== messageId));
     } else {
       // Reward 1 coin for participating in the chat
-      rewardForChat().catch(console.error);
+      rewardForChat().then((res) => {
+        if (res?.success) {
+          window.dispatchEvent(new CustomEvent("coins-updated", { detail: { amount: 1 } }));
+        }
+      }).catch(console.error);
     }
   };
 
