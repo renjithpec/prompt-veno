@@ -44,7 +44,7 @@ export function LikeButton({
       
       // If error is related to auth, redirect to login
       if (result.error.toLowerCase().includes("unauthorized")) {
-        router.push("/auth/sign-in");
+        router.push("/login");
       }
     } else if (result && "liked" in result && typeof result.liked === "boolean") {
       // Sync with server result just in case
