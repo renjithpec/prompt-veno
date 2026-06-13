@@ -57,7 +57,7 @@ export function GlobalSearch({ open, onOpenChange }: { open: boolean, onOpenChan
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl w-[95vw] sm:w-full !top-16 sm:!top-24 !translate-y-0 p-0 gap-0 overflow-hidden bg-background border-border rounded-2xl [&>button]:hidden shadow-[0_0_50px_rgba(0,0,0,0.5)]">
+      <DialogContent className="sm:max-w-xl w-full !top-20 sm:!top-12 !translate-y-0 p-0 gap-0 overflow-hidden bg-background border-border sm:border sm:rounded-2xl border-x-0 border-t-0 border-b rounded-b-3xl sm:rounded-b-2xl rounded-t-none [&>button]:hidden shadow-[0_40px_80px_rgba(0,0,0,0.8)]">
         <div className="flex items-center px-4 py-3 border-b border-border bg-panel2">
           <Search className="w-5 h-5 text-muted-foreground shrink-0" />
           <input

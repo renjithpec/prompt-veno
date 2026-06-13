@@ -21,8 +21,8 @@ export async function searchGlobal(query: string) {
     // 2. Search published prompts (by title)
     const { data: prompts } = await adminClient
       .from('prompts')
-      .select('id, title, slug, is_published')
-      .eq('is_published', true)
+      .select('id, title, slug, status')
+      .eq('status', 'approved')
       .ilike('title', searchTerm)
       .limit(5);
 
@@ -51,8 +51,8 @@ export async function getDefaultSearchSuggestions() {
     // 3 trending prompts
     const { data: prompts } = await adminClient
       .from('prompts')
-      .select('id, title, slug, is_published')
-      .eq('is_published', true)
+      .select('id, title, slug, status')
+      .eq('status', 'approved')
       .order('views', { ascending: false })
       .limit(3);
 
