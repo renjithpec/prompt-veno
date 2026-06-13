@@ -75,8 +75,9 @@ export type Notification = {
   id: string;
   user_id: string;
   actor_id: string;
-  type: 'like' | 'follow' | 'new_post';
+  type: 'like' | 'follow' | 'new_post' | 'announcement';
   prompt_id: string | null;
+  message_id: string | null;
   is_read: boolean;
   created_at: string;
   actor?: {
@@ -86,5 +87,8 @@ export type Notification = {
   prompt?: {
     title: string;
     slug: string;
+  };
+  message?: {
+    content: string;
   };
 };

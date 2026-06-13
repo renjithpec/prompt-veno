@@ -55,6 +55,14 @@ export function NotificationsDropdown({ initialNotifications }: { initialNotific
                    setNotifications(prev => [newNotif, ...prev].slice(0, 50));
                    setUnreadCount(prev => prev + 1);
                 });
+              } else if (newNotif.message_id) {
+                supabase.from('public_messages').select('content').eq('id', newNotif.message_id).single().then(({ data: msgData }) => {
+                   if (msgData) {
+                     newNotif.message = msgData;
+                   }
+                   setNotifications(prev => [newNotif, ...prev].slice(0, 50));
+                   setUnreadCount(prev => prev + 1);
+                });
               } else {
                 setNotifications(prev => [newNotif, ...prev].slice(0, 50));
                 setUnreadCount(prev => prev + 1);
@@ -90,6 +98,9 @@ export function NotificationsDropdown({ initialNotifications }: { initialNotific
     if (notification.type === 'new_post') {
       return <span><b>{actorName}</b> published a new prompt: <i>{notification.prompt?.title}</i></span>;
     }
+    if (notification.type === 'announcement') {
+      return <span><b>{actorName}</b> posted an announcement: <i className="text-muted-foreground">{notification.message?.content}</i></span>;
+    }
     return <span>New notification</span>;
   };
 
@@ -99,6 +110,9 @@ export function NotificationsDropdown({ initialNotifications }: { initialNotific
     }
     if (notification.type === 'follow') {
       return `/user/${notification.actor_id}`;
+    }
+    if (notification.type === 'announcement') {
+      return `/messages`;
     }
     return '#';
   };

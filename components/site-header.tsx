@@ -50,7 +50,7 @@ export function SiteHeader() {
         // Fetch notifications
         const { data: notifs } = await supabase
           .from("notifications")
-          .select("*, actor:profiles!notifications_actor_id_fkey(name, avatar), prompt:prompts(title, slug)")
+          .select("*, actor:profiles!notifications_actor_id_fkey(name, avatar), prompt:prompts(title, slug), message:public_messages(content)")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(50);
