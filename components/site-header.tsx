@@ -9,6 +9,7 @@ import { Menu, X, Home, Search, LayoutGrid, Info, PlusCircle, MessageSquare, Tro
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { NotificationsDropdown } from "@/components/notifications-dropdown";
+import { GlobalSearch } from "@/components/global-search";
 
 const navLinks = [
   { href: "/", label: "Home", icon: Home },
@@ -23,6 +24,7 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [coins, setCoins] = useState(0);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -88,6 +90,14 @@ export function SiteHeader() {
           <Image src="/logo-icon.png" alt="Prompt Veno" width={48} height={48} priority className="h-10 w-10 shrink-0" />
           <span className="font-display text-2xl font-black uppercase tracking-widest hidden xl:block leading-none mt-1">Prompt<br/>Veno</span>
         </Link>
+
+        <button 
+          onClick={() => setSearchOpen(true)}
+          className="mb-3 relative flex items-center justify-center xl:justify-start gap-4 rounded-[24px] p-3 xl:px-5 xl:py-4 font-display text-sm font-black uppercase tracking-widest transition-all duration-300 text-muted-foreground hover:bg-foreground/[0.08] hover:text-foreground w-full"
+        >
+          <Search className="h-6 w-6 xl:h-5 xl:w-5 shrink-0" />
+          <span className="hidden xl:block">Search</span>
+        </button>
         
         <nav className="flex flex-1 flex-col gap-3">
           {navLinks.map((link) => {
@@ -222,6 +232,13 @@ export function SiteHeader() {
           )}
           {user && <NotificationsDropdown initialNotifications={notifications} />}
           <button 
+            aria-label="Search" 
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-foreground/5 text-muted-foreground shadow-lg backdrop-blur-md transition hover:bg-foreground/10 hover:text-foreground"
+            onClick={() => setSearchOpen(true)}
+          >
+            <Search className="h-5 w-5" />
+          </button>
+          <button 
             aria-label="Open navigation" 
             className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-foreground/5 text-muted-foreground shadow-lg backdrop-blur-md transition hover:bg-foreground/10 hover:text-foreground"
             onClick={() => setOpen(true)}
@@ -294,6 +311,8 @@ export function SiteHeader() {
         </motion.div>
       )}
     </AnimatePresence>
+    
+    <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </>
   );
 }

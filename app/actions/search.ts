@@ -1,0 +1,37 @@
+"use server";
+
+import { createSupabaseAdminClient } from "@/lib/supabase/server";
+
+export async function searchGlobal(query: string) {
+  if (!query || query.trim().length < 2) return { profiles: [], prompts: [] };
+
+  const adminClient = createSupabaseAdminClient();
+  if (!adminClient) return { profiles: [], prompts: [] };
+
+  const searchTerm = `%${query.trim()}%`;
+
+  try {
+    // 1. Search profiles (by name)
+    const { data: profiles } = await adminClient
+      .from('profiles')
+      .select('id, name, avatar')
+      .ilike('name', searchTerm)
+      .limit(5);
+
+    // 2. Search published prompts (by title)
+    const { data: prompts } = await adminClient
+      .from('prompts')
+      .select('id, title, slug, is_published')
+      .eq('is_published', true)
+      .ilike('title', searchTerm)
+      .limit(5);
+
+    return {
+      profiles: profiles || [],
+      prompts: prompts || []
+    };
+  } catch (error) {
+    console.error("Search Error:", error);
+    return { profiles: [], prompts: [] };
+  }
+}
