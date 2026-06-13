@@ -167,7 +167,13 @@ export async function getPrompts(options: { query?: string; category?: string; t
     savedPromptIds.has(row.id)
   ));
   if (options.tag) rows = rows.filter((prompt) => prompt.tags.some((item) => item.slug === options.tag));
-  return rows.length ? rows : searchLocalPrompts(options.query, options.category, options.tag, sort);
+  
+  // Only fallback to local sample data if we didn't query a specific user/saved list and the DB is completely empty.
+  // Otherwise, legitimately return 0 rows.
+  if (rows.length === 0 && !options.user_id && !options.savedOnly && !options.query) {
+    return searchLocalPrompts(options.query, options.category, options.tag, sort);
+  }
+  return rows;
 }
 
 export async function getPromptBySlug(slug: string): Promise<Prompt | null> {
