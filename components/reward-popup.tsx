@@ -62,7 +62,10 @@ export function RewardPopup({ initialHasClaimed = false, userId }: { initialHasC
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 px-4 sm:p-6">
+        <div 
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 px-4 sm:p-6"
+          style={{ pointerEvents: 'auto' }}
+        >
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
