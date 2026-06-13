@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { User } from "@supabase/supabase-js";
-import { User as UserIcon, Lock, AlertTriangle, Loader2, Sparkles, Clock, CheckCircle, XCircle, Edit2, Trash2 } from "lucide-react";
+import { User as UserIcon, Lock, AlertTriangle, Loader2, Sparkles, Clock, CheckCircle, XCircle, Edit2, Trash2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { updateProfile, updatePassword, deleteAccount, deletePrompt } from "@/app/actions/user";
@@ -15,6 +15,8 @@ export function SettingsClient({ user, profile, userPrompts }: { user: User; pro
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   
   const [profileStatus, setProfileStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [profileMessage, setProfileMessage] = useState("");
@@ -184,26 +186,36 @@ export function SettingsClient({ user, profile, userPrompts }: { user: User; pro
               <div className="grid gap-4 sm:grid-cols-2 w-full">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">Current Password</label>
-                  <Input 
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="bg-foreground/5 border-border text-foreground focus:border-accent"
-                    required
-                  />
+                  <div className="relative">
+                    <Input 
+                      type={showCurrentPassword ? "text" : "password"}
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="bg-foreground/5 border-border text-foreground focus:border-accent pr-10"
+                      required
+                    />
+                    <button type="button" onClick={() => setShowCurrentPassword(!showCurrentPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" tabIndex={-1}>
+                      {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-muted-foreground">New Password</label>
-                  <Input 
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="bg-foreground/5 border-border text-foreground focus:border-accent"
-                    required
-                    minLength={8}
-                  />
+                  <div className="relative">
+                    <Input 
+                      type={showNewPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="bg-foreground/5 border-border text-foreground focus:border-accent pr-10"
+                      required
+                      minLength={8}
+                    />
+                    <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" tabIndex={-1}>
+                      {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
               </div>
 

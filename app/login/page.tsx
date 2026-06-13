@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { signInWithEmail, signUpWithEmail, signInWithGoogle } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const defaultMode = searchParams.get("mode") === "signup" ? "signup" : "signin";
 
   const [mode, setMode] = useState<"signin" | "signup">(defaultMode);
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <section className="mx-auto grid min-h-[calc(100svh-64px)] max-w-md content-center px-4 py-12">
@@ -73,7 +75,12 @@ export default function LoginPage() {
           <form action={signInWithEmail} className="mt-5 grid gap-3">
             <Input name="email" type="email" autoComplete="email" placeholder="Email" required />
             <div className="flex flex-col gap-1">
-              <Input name="password" type="password" autoComplete="current-password" placeholder="Password" required />
+              <div className="relative">
+                <Input name="password" type={showPassword ? "text" : "password"} autoComplete="current-password" placeholder="Password" required className="pr-10" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" tabIndex={-1}>
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               <Link href="/reset-password" className="text-right text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors">
                 Forgot password?
               </Link>
@@ -87,7 +94,12 @@ export default function LoginPage() {
           <form action={signUpWithEmail} className="mt-5 grid gap-3">
             <Input name="name" type="text" autoComplete="name" placeholder="Full Name" required />
             <Input name="email" type="email" autoComplete="email" placeholder="Email" required />
-            <Input name="password" type="password" autoComplete="new-password" placeholder="Password (min 6 characters)" required minLength={6} />
+            <div className="relative">
+              <Input name="password" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="Password (min 6 characters)" required minLength={6} className="pr-10" />
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" tabIndex={-1}>
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
             <SubmitButton loadingText="Creating account...">Create Account</SubmitButton>
           </form>
         )}

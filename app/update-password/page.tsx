@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { updatePassword } from "@/app/actions/auth";
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/submit-button";
@@ -8,6 +9,7 @@ import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function UpdatePasswordPage() {
   const [state, formAction] = useActionState(updatePassword, null);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     // Initialize client-side Supabase to parse the URL hash fragment
@@ -30,7 +32,12 @@ export default function UpdatePasswordPage() {
         )}
 
         <form action={formAction} className="grid gap-4">
-          <Input name="password" type="password" autoComplete="new-password" placeholder="New password (min 6 chars)" required minLength={6} />
+          <div className="relative">
+            <Input name="password" type={showPassword ? "text" : "password"} autoComplete="new-password" placeholder="New password (min 6 chars)" required minLength={6} className="pr-10" />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" tabIndex={-1}>
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
           <SubmitButton loadingText="Updating...">Update Password</SubmitButton>
         </form>
       </div>
