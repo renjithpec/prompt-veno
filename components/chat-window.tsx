@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { rewardForChat, deductForDeletedChat } from "@/app/actions/rewards";
+import { adminDeleteChatMessage } from "@/app/actions/admin";
 import { format } from "date-fns";
 
 interface Community {
@@ -41,6 +42,7 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
   const [editingContent, setEditingContent] = useState("");
   const [showTerms, setShowTerms] = useState(true);
   const [agreed, setAgreed] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -61,8 +63,11 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUserId(user.id);
-        const { data: profile } = await supabase.from('profiles').select('name, avatar').eq('id', user.id).single();
-        if (profile) setUserProfile(profile);
+        const { data: profile } = await supabase.from('profiles').select('name, avatar, role').eq('id', user.id).single();
+        if (profile) {
+          setUserProfile(profile);
+          if (profile.role === 'admin') setIsAdmin(true);
+        }
       }
 
       // Fetch existing messages
@@ -192,9 +197,11 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
   };
 
   const handleDeleteMessage = async (messageId: string) => {
-    // Check if message is older than 60 minutes
     const msg = messages.find(m => m.id === messageId);
-    if (msg) {
+    if (!msg) return;
+
+    if (!isAdmin) {
+      // Check if message is older than 60 minutes
       const messageAgeMs = new Date().getTime() - new Date(msg.created_at).getTime();
       if (messageAgeMs >= 60 * 60 * 1000) {
         toast.error("Messages cannot be deleted after 1 hour.");
@@ -205,6 +212,18 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
 
     // Optimistic delete
     setMessages(current => current.filter(m => m.id !== messageId));
+
+    if (isAdmin && msg.user_id !== userId) {
+      // Admin deleting someone else's message
+      adminDeleteChatMessage(messageId, msg.user_id).then((res) => {
+        if (res?.error) {
+          toast.error(`Admin delete failed: ${res.error}`);
+        } else {
+          toast.success("Message deleted by admin.");
+        }
+      }).catch(console.error);
+      return;
+    }
 
     const { createSupabaseBrowserClient } = await import("@/lib/supabase/client");
     const supabase = createSupabaseBrowserClient();
@@ -396,7 +415,7 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
             const showHeader = index === 0 || messages[index - 1].user_id !== msg.user_id;
             const messageAgeMs = new Date().getTime() - new Date(msg.created_at).getTime();
             const canEdit = isMe && messageAgeMs < 30 * 60 * 1000;
-            const canDelete = isMe && messageAgeMs < 60 * 60 * 1000;
+            const canDelete = isAdmin || (isMe && messageAgeMs < 60 * 60 * 1000);
 
             return (
               <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
@@ -418,8 +437,8 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
                   </div>
                 )}
                 <div className={`flex items-center gap-2 group w-full ${isMe ? 'justify-end' : 'justify-start'}`}>
-                  {isMe && editingMessageId !== msg.id && (
-                    <div className="opacity-0 group-hover:opacity-100 flex items-center transition-all order-1">
+                  {(isMe || isAdmin) && editingMessageId !== msg.id && (
+                    <div className={`opacity-0 group-hover:opacity-100 flex items-center transition-all ${isMe ? 'order-1' : 'order-last'}`}>
                       {canEdit && (
                         <button 
                           onClick={() => {

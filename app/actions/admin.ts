@@ -294,3 +294,32 @@ export async function deleteTag(formData: FormData) {
     throw new Error(sanitizeError(error, "deleteTag"));
   }
 }
+
+export async function adminDeleteChatMessage(messageId: string, authorId: string) {
+  try {
+    const adminClient = await assertAdmin();
+    z.string().uuid().parse(messageId);
+    z.string().uuid().parse(authorId);
+
+    // Delete message
+    const { error: delError } = await adminClient.from("public_messages").delete().eq("id", messageId);
+    if (delError) throw delError;
+
+    // Deduct coin from author
+    const { data: profile } = await adminClient.from("profiles").select("coins").eq("id", authorId).single();
+    if (profile) {
+      const newCoins = Math.max(0, (profile.coins || 0) - 1);
+      await adminClient.from("profiles").update({ coins: newCoins }).eq("id", authorId);
+      await adminClient.from("coin_transactions").insert({
+        user_id: authorId,
+        amount: -1,
+        reason: "Message Deleted by Admin"
+      });
+    }
+
+    return { success: true };
+  } catch (error) {
+    return { error: sanitizeError(error, "adminDeleteChatMessage") };
+  }
+}
+
