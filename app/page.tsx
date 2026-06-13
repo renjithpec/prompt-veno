@@ -89,7 +89,7 @@ export default async function HomePage() {
           <TopThreePodium users={topUsers} />
           
           <div className="flex justify-center mt-2 mb-4">
-            <Button asChild variant="outline" className="rounded-full font-bold">
+            <Button asChild variant="secondary" className="rounded-full font-bold bg-transparent border-2 border-accent text-accent hover:bg-accent hover:text-black">
               <Link href="/ranks">View Full Leaderboard</Link>
             </Button>
           </div>
