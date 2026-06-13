@@ -37,7 +37,19 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
   const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState("");
+  const [showTerms, setShowTerms] = useState(false);
+  const [agreed, setAgreed] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Check if user has already agreed to terms
+    if (typeof window !== 'undefined') {
+      const hasAgreed = localStorage.getItem("chat_terms_agreed");
+      if (!hasAgreed) {
+        setShowTerms(true);
+      }
+    }
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -256,6 +268,66 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
 
   return (
     <div className="flex flex-col h-full bg-background relative z-0">
+      {/* Terms & Conditions Modal */}
+      <Dialog open={showTerms} onOpenChange={(open) => {
+        if (!open && localStorage.getItem("chat_terms_agreed") === "true") {
+          setShowTerms(false);
+        }
+      }}>
+        <DialogContent className="sm:max-w-md [&>button]:hidden" onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+          <DialogHeader>
+            <DialogTitle className="font-display font-black text-2xl uppercase tracking-wider text-accent flex items-center gap-2">
+              Chat Zone Rules
+            </DialogTitle>
+            <DialogDescription className="text-base text-foreground/80 mt-2">
+              Before you enter, you must agree to our community guidelines.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4 text-sm font-medium">
+            <div className="bg-panel p-4 rounded-xl border border-border/50 space-y-3">
+              <p className="flex gap-2">
+                <span className="text-accent font-bold">1.</span> 
+                <span><strong>Chat respectfully.</strong> Be kind to others. Harassment, toxicity, or hate speech will result in an immediate and permanent ban.</span>
+              </p>
+              <p className="flex gap-2">
+                <span className="text-accent font-bold">2.</span> 
+                <span><strong>No spam.</strong> Do not flood the chat or share malicious links.</span>
+              </p>
+              <p className="flex gap-2">
+                <span className="text-accent font-bold">3.</span> 
+                <span><strong>Moderation active.</strong> Admins will remove users who violate these terms without warning.</span>
+              </p>
+            </div>
+            
+            <label className="flex items-center space-x-3 mt-6 p-4 border-2 border-border rounded-xl bg-panel cursor-pointer hover:border-accent/50 transition-all select-none">
+              <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors shrink-0 ${agreed ? 'bg-accent border-accent text-black' : 'border-muted-foreground'}`}>
+                {agreed && <Check className="w-3.5 h-3.5" />}
+              </div>
+              <input 
+                type="checkbox" 
+                className="hidden" 
+                checked={agreed} 
+                onChange={() => setAgreed(!agreed)} 
+              />
+              <span className="font-bold">I agree to chat respectfully</span>
+            </label>
+          </div>
+          <DialogFooter className="sm:justify-end mt-2">
+            <Button 
+              type="button" 
+              className="w-full sm:w-auto font-bold uppercase tracking-wider"
+              disabled={!agreed}
+              onClick={() => {
+                localStorage.setItem("chat_terms_agreed", "true");
+                setShowTerms(false);
+              }}
+            >
+              Enter Chat
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={!!messageToDelete} onOpenChange={(open) => !open && setMessageToDelete(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
