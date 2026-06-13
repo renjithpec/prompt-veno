@@ -6,7 +6,7 @@ export const revalidate = 60; // Revalidate every minute
 export default async function RanksPage() {
   const supabase = await createSupabaseServerClient();
   let currentUserId: string | null = null;
-  let topUsers = [];
+  let topUsers: any[] = [];
   
   if (supabase) {
     const { data: { user } } = await supabase.auth.getUser();
