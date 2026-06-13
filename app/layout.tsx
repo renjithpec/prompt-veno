@@ -83,21 +83,23 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${spaceGrotesk.variable} ${caveat.variable} font-sans`} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          {/* Animated Background Motion Element */}
-          <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-            <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-accent/10 blur-[100px] animate-blob" />
-            <div className="absolute top-[20%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-accent/5 blur-[100px] animate-blob animation-delay-2000" />
-            <div className="absolute bottom-[-20%] left-[20%] w-[45vw] h-[45vw] rounded-full bg-accent/10 blur-[120px] animate-blob animation-delay-4000" />
-          </div>
-
-          <div className="flex min-h-screen max-w-full">
-            <SiteHeader />
-            <div className="flex-1 flex flex-col min-h-screen min-w-0 pt-20 md:pt-0 md:pl-[280px]">
-              <main className="flex-1">{children}</main>
-              <SiteFooter settings={settings} />
+          <div className="overflow-hidden w-full relative min-h-screen">
+            {/* Animated Background Motion Element */}
+            <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+              <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-accent/10 blur-[100px] animate-blob" />
+              <div className="absolute top-[20%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-accent/5 blur-[100px] animate-blob animation-delay-2000" />
+              <div className="absolute bottom-[-20%] left-[20%] w-[45vw] h-[45vw] rounded-full bg-accent/10 blur-[120px] animate-blob animation-delay-4000" />
             </div>
+
+            <div className="flex min-h-screen max-w-full">
+              <SiteHeader />
+              <div className="flex-1 flex flex-col min-h-screen min-w-0 pt-20 md:pt-0 md:pl-[100px] xl:pl-[280px] transition-all duration-300">
+                <main className="flex-1 min-w-0">{children}</main>
+                <SiteFooter settings={settings} />
+              </div>
+            </div>
+            <RewardPopup initialHasClaimed={hasClaimedDaily} userId={userId} />
           </div>
-          <RewardPopup initialHasClaimed={hasClaimedDaily} userId={userId} />
           <Toaster position="bottom-center" />
         </ThemeProvider>
       </body>

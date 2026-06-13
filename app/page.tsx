@@ -5,6 +5,8 @@ import { AnimatedLink } from "@/components/animated-link";
 import { Button } from "@/components/ui/button";
 import { PromptCard } from "@/components/prompt-card";
 import { getCategories, getPrompts, getPublicStats } from "@/lib/data";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { TopThreePodium } from "@/components/top-three-podium";
 
 export default async function HomePage() {
   const [featured, categories, trending, publicStats] = await Promise.all([
@@ -13,6 +15,13 @@ export default async function HomePage() {
     getPrompts({ sort: "trending", limit: 6 }),
     getPublicStats()
   ]);
+
+  const supabase = await createSupabaseServerClient();
+  let topUsers: any[] = [];
+  if (supabase) {
+    const { data } = await supabase.from('profiles').select('id, name, avatar, coins').order('coins', { ascending: false }).order('created_at', { ascending: true }).limit(3);
+    if (data) topUsers = data;
+  }
 
   return (
     <>
@@ -40,8 +49,8 @@ export default async function HomePage() {
               </svg>
             </div>
 
-            <h1 className="font-display text-balance text-6xl font-black uppercase leading-[0.9] tracking-tight sm:text-7xl lg:text-8xl">
-              CREATE VIRAL<br />
+            <h1 className="font-display text-balance text-4xl font-black uppercase leading-[0.9] tracking-tight sm:text-7xl lg:text-8xl">
+              CREATE VIRAL<br className="hidden sm:block" />
               <span className="relative inline-block text-accent">
                 AI CONTENT
                 <svg className="absolute -bottom-4 left-0 w-full drawn-stroke" viewBox="0 0 200 20" preserveAspectRatio="none">
@@ -67,6 +76,25 @@ export default async function HomePage() {
           </AnimatedShell>
         </div>
       </section>
+
+      {topUsers.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 sm:px-6 pb-8">
+          <div className="flex flex-col items-center mb-6">
+            <h2 className="font-display text-4xl font-black uppercase tracking-tight text-accent flex items-center gap-3">
+              Top Creators
+            </h2>
+            <p className="text-muted-foreground mt-2 font-medium">Earn coins and climb the ranks to get featured here!</p>
+          </div>
+          
+          <TopThreePodium users={topUsers} />
+          
+          <div className="flex justify-center mt-2 mb-4">
+            <Button asChild variant="outline" className="rounded-full font-bold">
+              <Link href="/ranks">View Full Leaderboard</Link>
+            </Button>
+          </div>
+        </section>
+      )}
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 pb-20">
         <div className="neon-container p-4 sm:p-8 lg:p-12">

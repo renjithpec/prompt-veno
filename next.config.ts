@@ -19,7 +19,7 @@ const securityHeaders = [
       "default-src 'self'",
       "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://images.unsplash.com https://i.pravatar.cc https://*.supabase.co",
+      "img-src 'self' data: blob: https://images.unsplash.com https://i.pravatar.cc https://*.supabase.co https://lh3.googleusercontent.com https://avatars.githubusercontent.com",
       "font-src 'self'",
       "connect-src 'self' https://*.supabase.co",
       "frame-ancestors 'none'",
@@ -34,7 +34,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "i.pravatar.cc" },
-      { protocol: "https", hostname: "*.supabase.co" }
+      { protocol: "https", hostname: "*.supabase.co" },
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
+      { protocol: "https", hostname: "avatars.githubusercontent.com" }
     ]
   },
   async headers() {

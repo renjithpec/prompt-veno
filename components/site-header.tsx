@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, Home, Search, LayoutGrid, Info, PlusCircle } from "lucide-react";
+import { Menu, X, Home, Search, LayoutGrid, Info, PlusCircle, MessageSquare, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { NotificationsDropdown } from "@/components/notifications-dropdown";
@@ -14,6 +14,8 @@ const navLinks = [
   { href: "/", label: "Home", icon: Home },
   { href: "/prompts", label: "Prompts", icon: Search },
   { href: "/category/veo3", label: "Categories", icon: LayoutGrid },
+  { href: "/messages", label: "Messages", icon: MessageSquare },
+  { href: "/ranks", label: "Ranks", icon: Trophy },
   { href: "/about", label: "About", icon: Info }
 ];
 
@@ -78,12 +80,13 @@ export function SiteHeader() {
 
   return (
     <>
-    <header className="fixed top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-2xl md:bottom-4 md:left-4 md:top-4 md:w-[250px] md:rounded-[32px] md:border-2 md:border-border md:bg-panel2/70 md:shadow-[0_0_40px_rgba(0,0,0,0.2)]">
+    <header className="fixed top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-2xl md:bottom-4 md:left-4 md:top-4 md:w-[80px] xl:w-[250px] md:rounded-[32px] md:border-2 md:border-border md:bg-panel2/70 md:shadow-[0_0_40px_rgba(0,0,0,0.2)] transition-all duration-300 overflow-visible">
       
       {/* Desktop Sidebar Layout */}
-      <div className="hidden h-full flex-col px-4 py-8 md:flex">
-        <Link href="/" className="mb-10 px-2" aria-label="Prompt Veno home">
-          <Image src="/logo.svg" alt="Prompt Veno" width={436} height={136} priority className="h-12 w-auto" />
+      <div className="hidden h-full flex-col px-2 xl:px-4 py-8 md:flex">
+        <Link href="/" className="mb-10 px-2 flex justify-center xl:justify-start" aria-label="Prompt Veno home">
+          <Image src="/logo.svg" alt="Prompt Veno" width={436} height={136} priority className="h-12 w-auto hidden xl:block" />
+          <Image src="/logo-icon.svg" alt="Prompt Veno" width={48} height={48} priority className="h-8 w-8 hidden md:block xl:hidden" />
         </Link>
         
         <nav className="flex flex-1 flex-col gap-3">
@@ -93,7 +96,7 @@ export function SiteHeader() {
               <Link 
                 key={link.href} 
                 href={link.href} 
-                className={`relative flex items-center gap-4 rounded-[24px] px-5 py-4 font-display text-sm font-black uppercase tracking-widest transition-all duration-300 ${
+                className={`relative flex items-center justify-center xl:justify-start gap-4 rounded-[24px] p-3 xl:px-5 xl:py-4 font-display text-sm font-black uppercase tracking-widest transition-all duration-300 ${
                   isActive 
                     ? "text-background scale-105 z-10" 
                     : "text-muted-foreground hover:bg-foreground/10 hover:text-foreground"
@@ -102,44 +105,53 @@ export function SiteHeader() {
                 {isActive && (
                   <motion.div
                     layoutId="active-sidebar-pill"
-                    className="absolute inset-y-0 -right-4 left-0 -z-10 rounded-[24px] bg-foreground shadow-xl"
+                    className="absolute inset-y-0 right-0 left-0 -z-10 rounded-[24px] bg-foreground shadow-xl"
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   />
                 )}
                 <link.icon className="relative z-20 h-5 w-5 shrink-0" />
-                <span className="relative z-20">{link.label}</span>
+                <span className="relative z-20 hidden xl:block">{link.label}</span>
               </Link>
             );
           })}
+          {/* Coins Link */}
+          {user && (
+            <Link href="/rewards" className={`relative flex items-center justify-center xl:justify-start gap-4 rounded-[24px] p-3 xl:px-5 xl:py-4 font-display text-sm font-black uppercase tracking-widest transition-all duration-300 ${pathname.startsWith('/rewards') ? "text-background scale-105 z-10" : "text-muted-foreground hover:bg-foreground/10 hover:text-foreground"}`}>
+              {pathname.startsWith('/rewards') && (
+                <motion.div layoutId="active-sidebar-pill" className="absolute inset-y-0 right-0 left-0 -z-10 rounded-[24px] bg-foreground shadow-xl" transition={{ type: "spring", stiffness: 400, damping: 30 }} />
+              )}
+              <Image src="/coin-asset.png" alt="Coins" width={20} height={20} className="relative z-20 h-5 w-5 shrink-0 animate-pulse drop-shadow-[0_0_8px_rgba(212,255,58,0.6)]" />
+              <span className="relative z-20 hidden xl:block">{coins} Coins</span>
+            </Link>
+          )}
         </nav>
         
-        <div className="mt-auto flex flex-col gap-3 pt-6 relative">
-          <div className="flex w-full gap-2">
-            <Link href="/contribute" className="flex flex-1 items-center justify-center gap-2 rounded-full border-2 border-accent bg-transparent px-4 py-3 font-display text-xs font-black uppercase tracking-widest text-foreground transition hover:bg-accent hover:text-black">
-              <PlusCircle className="h-4 w-4 shrink-0" />
-              Contribute
+        <div className="mt-auto flex flex-col gap-3 pt-6 relative items-center xl:items-stretch">
+          <div className="flex w-full gap-3 flex-col xl:flex-row items-center justify-center">
+            <Link href="/contribute" className="flex items-center justify-center gap-2 rounded-full border-2 border-accent bg-transparent w-12 h-12 xl:flex-1 xl:w-auto xl:h-auto xl:py-3 xl:px-4 font-display text-xs font-black uppercase tracking-widest text-foreground transition hover:bg-accent hover:text-black shrink-0">
+              <PlusCircle className="h-5 w-5 shrink-0" />
+              <span className="hidden xl:block">Contribute</span>
             </Link>
-            <ThemeToggle />
+            <div className="shrink-0">
+              <ThemeToggle />
+            </div>
           </div>
 
           {!loading && user ? (
-            <div className="flex w-full items-center gap-2 relative">
-              <NotificationsDropdown initialNotifications={notifications} />
+            <div className="flex w-full items-center justify-center gap-3 relative flex-col xl:flex-row">
+              <div className="shrink-0">
+                <NotificationsDropdown initialNotifications={notifications} />
+              </div>
               
-              <Link href="/rewards" className="flex items-center justify-center gap-1.5 rounded-full border-2 border-border bg-foreground/[0.02] px-3 py-3 font-display text-sm font-black uppercase tracking-widest text-foreground dark:text-accent transition-all hover:border-accent hover:bg-foreground/[0.06] hover:shadow-[0_0_20px_rgba(214,255,127,0.2)]">
-                <Image src="/coin-asset.png" alt="Coins" width={20} height={20} className="h-5 w-5 animate-pulse drop-shadow-[0_0_8px_rgba(212,255,58,0.6)]" />
-                {coins}
-              </Link>
-              
-              <div className="relative flex-1">
+              <div className="relative flex-1 w-full flex justify-center">
                 <button 
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="tap flex w-full items-center justify-center gap-2 rounded-full border-2 border-border bg-foreground/[0.02] py-3 font-display text-sm font-black uppercase tracking-widest text-foreground transition-all hover:border-accent hover:bg-foreground/[0.06] hover:shadow-[0_0_20px_rgba(214,255,127,0.2)]"
+                  className="tap flex items-center justify-center gap-2 rounded-full border-2 border-border bg-foreground/[0.02] w-12 h-12 xl:w-full xl:h-auto xl:py-3 xl:px-4 font-display text-sm font-black uppercase tracking-widest text-foreground transition-all hover:border-accent hover:bg-foreground/[0.06] hover:shadow-[0_0_20px_rgba(214,255,127,0.2)] shrink-0"
                 >
                   <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-black">
                     {user.email?.[0].toUpperCase() || "U"}
                   </div>
-                  Account
+                  <span className="hidden xl:block">Account</span>
                 </button>
               
               <AnimatePresence>
@@ -151,7 +163,7 @@ export function SiteHeader() {
                       animate={{ opacity: 1, x: 0, scale: 1 }} 
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute bottom-full left-0 z-50 mb-2 w-56 overflow-hidden rounded-card border border-border bg-panel p-1 shadow-2xl backdrop-blur-xl"
+                      className="absolute bottom-full left-0 xl:left-auto xl:top-auto xl:bottom-0 xl:left-full z-50 mb-2 xl:mb-0 xl:ml-2 w-56 overflow-hidden rounded-card border border-border bg-panel p-1 shadow-2xl backdrop-blur-xl"
                     >
                       <div className="px-2 py-2.5 text-sm text-foreground">
                         <p className="font-medium">Logged in as</p>
@@ -186,8 +198,8 @@ export function SiteHeader() {
             </div>
           ) : !loading ? (
             <div className="flex flex-col gap-2">
-              <Button asChild variant="ghost" className="rounded-full font-display font-black uppercase tracking-widest w-full"><Link href="/login">Sign in</Link></Button>
-              <Button asChild className="rounded-full font-display font-black uppercase tracking-widest bg-accent text-black hover:bg-accent/80 hover:shadow-[0_0_20px_rgba(214,255,127,0.4)] w-full"><Link href="/prompts">Get Started</Link></Button>
+              <Button asChild variant="ghost" className="rounded-full font-display font-black uppercase tracking-widest w-full px-2"><Link href="/login" className="flex justify-center"><span className="hidden xl:block">Sign in</span><span className="xl:hidden">In</span></Link></Button>
+              <Button asChild className="rounded-full font-display font-black uppercase tracking-widest bg-accent text-black hover:bg-accent/80 hover:shadow-[0_0_20px_rgba(214,255,127,0.4)] w-full px-2"><Link href="/prompts" className="flex justify-center"><span className="hidden xl:block">Get Started</span><span className="xl:hidden">Go</span></Link></Button>
             </div>
           ) : (
             <div className="h-12 w-full animate-pulse rounded-full bg-foreground/5" />
