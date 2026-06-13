@@ -82,9 +82,15 @@ export default async function RewardsPage() {
                     })}
                   </span>
                 </div>
-                <div className="flex items-center gap-2 rounded-full bg-accent/10 px-3 py-1 border border-accent/20">
-                  <span className="font-bold text-accent">+{tx.amount}</span>
-                  <Image src="/coin-asset.png" alt="coin" width={16} height={16} className="h-4 w-4" />
+                <div className={`flex items-center gap-2 rounded-full px-3 py-1 border ${
+                  tx.amount > 0 
+                    ? 'bg-accent/10 border-accent/20' 
+                    : 'bg-red-500/10 border-red-500/20'
+                }`}>
+                  <span className={`font-bold ${tx.amount > 0 ? 'text-accent' : 'text-red-500'}`}>
+                    {tx.amount > 0 ? '+' : ''}{tx.amount}
+                  </span>
+                  <Image src="/coin-asset.png" alt="coin" width={16} height={16} className={`h-4 w-4 ${tx.amount <= 0 ? 'grayscale opacity-80' : ''}`} />
                 </div>
               </div>
             ))}
