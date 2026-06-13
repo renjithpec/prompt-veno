@@ -128,3 +128,45 @@ export async function claimDailyReward() {
     return { error: sanitizeError(error, "claimDailyReward") };
   }
 }
+
+export async function rewardForChat() {
+  try {
+    const supabase = await createSupabaseServerClient();
+    if (!supabase) throw new Error("Database not configured");
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Unauthorized");
+
+    const adminClient = createSupabaseAdminClient();
+    if (!adminClient) throw new Error("Database admin not configured");
+
+    const { data: targetProfile, error: profileError } = await adminClient
+      .from("profiles")
+      .select("coins")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError) throw profileError;
+
+    const currentCoins = targetProfile?.coins || 0;
+    
+    const { error: updateError } = await adminClient
+      .from("profiles")
+      .update({ coins: currentCoins + 1 })
+      .eq("id", user.id);
+
+    if (updateError) throw updateError;
+
+    await adminClient
+      .from("coin_transactions")
+      .insert({
+        user_id: user.id,
+        amount: 1,
+        reason: "Chat Message Sent"
+      });
+
+    return { success: true };
+  } catch (error) {
+    return { error: sanitizeError(error, "rewardForChat") };
+  }
+}

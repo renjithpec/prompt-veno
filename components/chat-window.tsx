@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { rewardForChat } from "@/app/actions/rewards";
 import { format } from "date-fns";
 
 interface Community {
@@ -181,6 +183,9 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
       console.error("Error sending message:", error);
       toast.error(`Failed to send: ${error.message}`);
       setMessages(current => current.filter(m => m.id !== messageId));
+    } else {
+      // Reward 1 coin for participating in the chat
+      rewardForChat().catch(console.error);
     }
   };
 
