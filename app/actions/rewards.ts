@@ -170,3 +170,46 @@ export async function rewardForChat() {
     return { error: sanitizeError(error, "rewardForChat") };
   }
 }
+
+export async function deductForDeletedChat() {
+  try {
+    const supabase = await createSupabaseServerClient();
+    if (!supabase) throw new Error("Database not configured");
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Unauthorized");
+
+    const adminClient = createSupabaseAdminClient();
+    if (!adminClient) throw new Error("Database admin not configured");
+
+    const { data: targetProfile, error: profileError } = await adminClient
+      .from("profiles")
+      .select("coins")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError) throw profileError;
+
+    const currentCoins = targetProfile?.coins || 0;
+    const newCoins = Math.max(0, currentCoins - 1);
+    
+    const { error: updateError } = await adminClient
+      .from("profiles")
+      .update({ coins: newCoins })
+      .eq("id", user.id);
+
+    if (updateError) throw updateError;
+
+    await adminClient
+      .from("coin_transactions")
+      .insert({
+        user_id: user.id,
+        amount: -1,
+        reason: "Message Deleted"
+      });
+
+    return { success: true };
+  } catch (error) {
+    return { error: sanitizeError(error, "deductForDeletedChat") };
+  }
+}

@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { toast } from "sonner";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { rewardForChat } from "@/app/actions/rewards";
+import { rewardForChat, deductForDeletedChat } from "@/app/actions/rewards";
 import { format } from "date-fns";
 
 interface Community {
@@ -216,12 +216,19 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
       .eq('id', messageId)
       .eq('user_id', userId!);
       
-    if (error) {
-      console.error("Error deleting message:", error);
-      toast.error(`Failed to delete: ${error.message}`);
-      // Revert optimistic delete could be done here if we stored the original
-    }
-  };
+      if (error) {
+        console.error("Error deleting message:", error);
+        toast.error(`Failed to delete: ${error.message}`);
+        // Revert optimistic delete could be done here if we stored the original
+      } else {
+        // Successfully deleted: deduct the coin
+        deductForDeletedChat().then((res) => {
+          if (res?.success) {
+            window.dispatchEvent(new CustomEvent("coins-updated", { detail: { amount: -1 } }));
+          }
+        }).catch(console.error);
+      }
+    };
 
   const handleUpdateMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
