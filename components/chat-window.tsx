@@ -92,7 +92,7 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
 
       // Subscribe to real-time updates
       const channelName = `room:${room.id}`;
-      const existingChannel = supabase.getChannels().find(c => c.topic === channelName);
+      const existingChannel = supabase.getChannels().find((c: any) => c.topic === channelName);
       if (existingChannel) {
         await supabase.removeChannel(existingChannel);
       }
