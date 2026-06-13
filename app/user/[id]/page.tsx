@@ -6,6 +6,7 @@ import { PromptCard } from "@/components/prompt-card";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { FollowButton } from "./follow-button";
 import { UserListModal } from "@/components/user-list-modal";
+import { VerifiedBadge } from "@/components/verified-badge";
 import { Prompt } from "@/lib/types";
 
 export default async function UserProfilePage({ params }: { params: Promise<{ id: string }> }) {
@@ -52,7 +53,7 @@ export default async function UserProfilePage({ params }: { params: Promise<{ id
             <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground sm:text-3xl">
               {profile.name || "Anonymous"}
               {(profile.is_verified || profile.follower_count >= 1000) && (
-                <BadgeCheck className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
+                <VerifiedBadge className="h-5 w-5 sm:h-6 sm:w-6 text-blue-400" />
               )}
             </h1>
             

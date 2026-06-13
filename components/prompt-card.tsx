@@ -8,6 +8,7 @@ import { LikeButton } from "@/components/like-button";
 import { DislikeButton } from "@/components/dislike-button";
 import { ShareButton } from "@/components/share-button";
 import { SaveButton } from "@/components/save-button";
+import { VerifiedBadge } from "@/components/verified-badge";
 
 export function PromptCard({ prompt }: { prompt: Prompt }) {
   return (
@@ -38,7 +39,7 @@ export function PromptCard({ prompt }: { prompt: Prompt }) {
               </div>
               <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground group-hover/author:text-foreground">
                 {prompt.profiles.name || "Anonymous"}
-                {(prompt.profiles.is_verified) && <BadgeCheck className="h-3.5 w-3.5 text-blue-400" />}
+                {(prompt.profiles.is_verified) && <VerifiedBadge className="h-3.5 w-3.5 text-blue-400" />}
               </div>
             </Link>
           )}

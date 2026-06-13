@@ -14,6 +14,7 @@ import { getPromptBySlug, getPrompts, getSettings, trackPromptEvent, checkIsFoll
 import { absoluteUrl } from "@/lib/utils";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { FollowButton } from "@/app/user/[id]/follow-button";
+import { VerifiedBadge } from "@/components/verified-badge";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -144,7 +145,7 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
               <div className="min-w-0 flex-1">
                 <Link href={prompt.user_id ? `/user/${prompt.user_id}` : "#"} className="flex items-center gap-1 hover:text-accent">
                   <h2 className="truncate text-lg font-bold">{authorName}</h2>
-                  {(prompt.profiles?.is_verified) && <BadgeCheck className="h-4 w-4 shrink-0 text-blue-400" />}
+                  {(prompt.profiles?.is_verified) && <VerifiedBadge className="h-4 w-4 shrink-0 text-blue-400" />}
                 </Link>
                 <p className="truncate text-sm text-accent">{authorUsername}</p>
               </div>
