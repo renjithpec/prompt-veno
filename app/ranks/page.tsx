@@ -1,4 +1,4 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient, createSupabaseAdminClient } from "@/lib/supabase/server";
 import { LeaderboardClient } from "./leaderboard-client";
 
 export const dynamic = "force-dynamic";
@@ -13,8 +13,11 @@ export default async function RanksPage() {
     if (user) {
       currentUserId = user.id;
     }
+  }
 
-    const { data } = await supabase
+  const adminClient = createSupabaseAdminClient();
+  if (adminClient) {
+    const { data } = await adminClient
       .from('profiles')
       .select('id, name, avatar, coins')
       .order('coins', { ascending: false })

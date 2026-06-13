@@ -5,7 +5,7 @@ import { AnimatedLink } from "@/components/animated-link";
 import { Button } from "@/components/ui/button";
 import { PromptCard } from "@/components/prompt-card";
 import { getCategories, getPrompts, getPublicStats } from "@/lib/data";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServerClient, createSupabaseAdminClient } from "@/lib/supabase/server";
 import { TopThreePodium } from "@/components/top-three-podium";
 
 export const dynamic = "force-dynamic";
@@ -18,10 +18,10 @@ export default async function HomePage() {
     getPublicStats()
   ]);
 
-  const supabase = await createSupabaseServerClient();
+  const adminClient = createSupabaseAdminClient();
   let topUsers: any[] = [];
-  if (supabase) {
-    const { data } = await supabase.from('profiles').select('id, name, avatar, coins').order('coins', { ascending: false }).order('created_at', { ascending: true }).limit(3);
+  if (adminClient) {
+    const { data } = await adminClient.from('profiles').select('id, name, avatar, coins').order('coins', { ascending: false }).order('created_at', { ascending: true }).limit(3);
     if (data) topUsers = data;
   }
 
