@@ -213,6 +213,17 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
     setEditingMessageId(null);
     setEditingContent("");
 
+    // Check if message is older than 30 minutes
+    const msg = messages.find(m => m.id === id);
+    if (msg) {
+      const messageAgeMs = new Date().getTime() - new Date(msg.created_at).getTime();
+      if (messageAgeMs >= 30 * 60 * 1000) {
+        toast.error("Messages cannot be edited after 30 minutes.");
+        setEditingMessageId(null);
+        return;
+      }
+    }
+
     // Optimistic update
     setMessages(current => current.map(m => m.id === id ? { ...m, content, is_edited: true } : m));
 
@@ -295,6 +306,8 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
               : null;
               
             const showHeader = index === 0 || messages[index - 1].user_id !== msg.user_id;
+            const messageAgeMs = new Date().getTime() - new Date(msg.created_at).getTime();
+            const canEdit = isMe && messageAgeMs < 30 * 60 * 1000;
 
             return (
               <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
@@ -318,16 +331,18 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
                 <div className={`flex items-center gap-2 group w-full ${isMe ? 'justify-end' : 'justify-start'}`}>
                   {isMe && editingMessageId !== msg.id && (
                     <div className="opacity-0 group-hover:opacity-100 flex items-center transition-all order-1">
-                      <button 
-                        onClick={() => {
-                          setEditingMessageId(msg.id);
-                          setEditingContent(msg.content);
-                        }}
-                        className="p-1.5 text-muted-foreground hover:text-accent hover:bg-accent/10 rounded-full transition-all"
-                        title="Edit message"
-                      >
-                        <Pencil className="w-3.5 h-3.5" />
-                      </button>
+                      {canEdit && (
+                        <button 
+                          onClick={() => {
+                            setEditingMessageId(msg.id);
+                            setEditingContent(msg.content);
+                          }}
+                          className="p-1.5 text-muted-foreground hover:text-accent hover:bg-accent/10 rounded-full transition-all"
+                          title="Edit message"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                       <button 
                         onClick={() => setMessageToDelete(msg.id)}
                         className="p-1.5 text-red-500 hover:bg-red-500/10 rounded-full transition-all"
