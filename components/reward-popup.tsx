@@ -78,13 +78,6 @@ export function RewardPopup({ initialHasClaimed = false, userId }: { initialHasC
             transition={{ type: "spring", duration: 0.5, bounce: 0.3 }}
             className="relative w-full max-w-3xl overflow-hidden rounded-[32px] border border-border bg-panel shadow-2xl"
           >
-            <button 
-              onClick={handleClose}
-              className="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-md transition-colors hover:bg-black/80"
-            >
-              <X className="h-4 w-4" />
-            </button>
-
             {/* Background Image */}
             <div className="absolute inset-0 z-0">
               <Image 
@@ -182,6 +175,15 @@ export function RewardPopup({ initialHasClaimed = false, userId }: { initialHasC
                 </div>
               </div>
             </div>
+
+            {/* Close Button placed at the very end of the DOM to guarantee it's on top of everything */}
+            <button 
+              onClick={handleClose}
+              className="absolute right-4 top-4 z-[100] flex h-10 w-10 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-md transition-all hover:bg-black hover:scale-110 active:scale-95 cursor-pointer shadow-xl border border-white/10"
+              aria-label="Close"
+            >
+              <X className="h-5 w-5 sm:h-4 sm:w-4" />
+            </button>
           </motion.div>
         </div>
       )}
