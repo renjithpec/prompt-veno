@@ -246,7 +246,7 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
             <Button type="button" variant="ghost" onClick={() => setMessageToDelete(null)}>
               Cancel
             </Button>
-            <Button type="button" variant="destructive" onClick={() => {
+            <Button type="button" variant="danger" onClick={() => {
               if (messageToDelete) handleDeleteMessage(messageToDelete);
               setMessageToDelete(null);
             }}>
