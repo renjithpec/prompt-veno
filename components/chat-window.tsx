@@ -152,6 +152,7 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
 
     const { createSupabaseBrowserClient } = await import("@/lib/supabase/client");
     const supabase = createSupabaseBrowserClient();
+    if (!supabase) return;
 
     const messageId = crypto.randomUUID();
     
@@ -187,6 +188,7 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
 
     const { createSupabaseBrowserClient } = await import("@/lib/supabase/client");
     const supabase = createSupabaseBrowserClient();
+    if (!supabase) return;
     
     const { error } = await supabase
       .from('public_messages')
@@ -216,6 +218,7 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
 
     const { createSupabaseBrowserClient } = await import("@/lib/supabase/client");
     const supabase = createSupabaseBrowserClient();
+    if (!supabase) return;
     
     const { error } = await supabase
       .from('public_messages')
