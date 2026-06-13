@@ -7,7 +7,10 @@ export function SiteFooter({ settings }: { settings: Settings }) {
     <footer className="border-t border-white/[0.08] bg-[#050505]">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
-          <Image src="/logo.svg" alt="Prompt Veno" width={436} height={136} className="h-12 w-auto" />
+          <div className="flex items-center gap-2">
+            <Image src="/logo-icon.png" alt="Prompt Veno" width={48} height={48} className="h-10 w-10 shrink-0" />
+            <span className="font-display text-2xl font-black uppercase tracking-widest leading-none mt-1 text-white">Prompt Veno</span>
+          </div>
           <p className="mt-3 max-w-sm text-sm leading-6 text-zinc-400">{settings.site_description}</p>
         </div>
         <div className="grid gap-3 text-sm">

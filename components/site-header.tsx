@@ -84,9 +84,9 @@ export function SiteHeader() {
       
       {/* Desktop Sidebar Layout */}
       <div className="hidden h-full flex-col px-2 xl:px-4 py-8 md:flex">
-        <Link href="/" className="mb-10 px-2 flex justify-center xl:justify-start" aria-label="Prompt Veno home">
-          <Image src="/logo.svg" alt="Prompt Veno" width={436} height={136} priority className="h-12 w-auto hidden xl:block" />
-          <Image src="/logo-icon.svg" alt="Prompt Veno" width={48} height={48} priority className="h-8 w-8 hidden md:block xl:hidden" />
+        <Link href="/" className="mb-10 px-2 flex items-center justify-center xl:justify-start gap-3" aria-label="Prompt Veno home">
+          <Image src="/logo-icon.png" alt="Prompt Veno" width={48} height={48} priority className="h-10 w-10 shrink-0" />
+          <span className="font-display text-2xl font-black uppercase tracking-widest hidden xl:block leading-none mt-1">Prompt<br/>Veno</span>
         </Link>
         
         <nav className="flex flex-1 flex-col gap-3">
@@ -209,8 +209,9 @@ export function SiteHeader() {
 
       {/* Mobile Top Bar Layout */}
       <div className="mx-auto flex h-20 w-full items-center justify-between px-4 md:hidden">
-        <Link href="/" className="flex items-center" aria-label="Prompt Veno home">
-          <Image src="/logo.svg" alt="Prompt Veno" width={436} height={136} priority className="h-10 w-auto" />
+        <Link href="/" className="flex items-center gap-2" aria-label="Prompt Veno home">
+          <Image src="/logo-icon.png" alt="Prompt Veno" width={48} height={48} priority className="h-8 w-8 shrink-0" />
+          <span className="font-display text-lg font-black uppercase tracking-widest leading-none mt-1">Prompt Veno</span>
         </Link>
         <div className="flex items-center gap-2">
           {user && (
@@ -237,7 +238,10 @@ export function SiteHeader() {
         <motion.div className="fixed inset-0 z-[100] bg-black/70 md:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <motion.div className="ml-auto flex h-full w-[86vw] max-w-sm flex-col border-l border-border bg-panel p-4" initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", bounce: 0, duration: 0.35 }}>
             <div className="flex items-center justify-between">
-              <Image src="/logo.svg" alt="Prompt Veno" width={436} height={136} className="h-12 w-auto" />
+              <Link href="/" onClick={() => setOpen(false)} className="flex items-center gap-3">
+                <Image src="/logo-icon.png" alt="Prompt Veno" width={48} height={48} className="h-10 w-10 shrink-0" />
+                <span className="font-display text-xl font-black uppercase tracking-widest leading-none mt-1">Prompt Veno</span>
+              </Link>
               <Button aria-label="Close navigation" size="icon" variant="ghost" onClick={() => setOpen(false)}><X className="h-5 w-5" /></Button>
             </div>
             <div className="mt-8 flex-1 overflow-y-auto no-scrollbar grid content-start gap-2 pb-6">

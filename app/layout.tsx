@@ -31,9 +31,9 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: settings.site_description,
     icons: {
-      icon: "/favicon.svg",
-      shortcut: "/favicon.svg",
-      apple: "/logo-icon.svg"
+      icon: "/logo-icon.png",
+      shortcut: "/logo-icon.png",
+      apple: "/logo-icon.png"
     },
     alternates: { canonical: "/" },
     openGraph: {

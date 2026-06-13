@@ -71,7 +71,7 @@ export default async function PromptDetailPage({ params }: { params: Promise<{ s
   }
 
   const authorName = prompt.profiles?.name || settings.creator_name;
-  const authorAvatar = prompt.profiles?.avatar || "/logo-icon.svg";
+  const authorAvatar = prompt.profiles?.avatar || "/logo-icon.png";
   const authorUsername = prompt.profiles?.name ? `@${prompt.profiles.name.toLowerCase().replace(/[^a-z0-9]/g, "")}` : settings.instagram_username;
   const authorInstagram = prompt.profiles?.instagram_url || settings.instagram_url;
 
