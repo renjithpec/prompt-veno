@@ -248,10 +248,34 @@ export async function getCategoryBySlug(slug: string) {
 
 export async function trackPromptEvent(slug: string, event: "view" | "copy") {
   if (!hasSupabaseEnv()) return;
-  const supabase = createSupabaseAdminClient();
-  if (!supabase) return;
+  const supabaseAdmin = createSupabaseAdminClient();
+  if (!supabaseAdmin) return;
   const field = event === "view" ? "views" : "copies";
-  await supabase.rpc("increment_prompt_metric", { prompt_slug: slug, metric_name: field });
+  await supabaseAdmin.rpc("increment_prompt_metric", { prompt_slug: slug, metric_name: field });
+
+  if (event === "copy") {
+    // Notify prompt owner
+    const { createSupabaseServerClient } = await import("@/lib/supabase/server");
+    const supabaseUser = await createSupabaseServerClient();
+    
+    const { data: prompt } = await supabaseAdmin.from('prompts').select('id, user_id').eq('slug', slug).single();
+    if (prompt) {
+      let actorId = null;
+      if (supabaseUser) {
+        const { data: { user } } = await supabaseUser.auth.getUser();
+        actorId = user?.id || null;
+      }
+      
+      if (prompt.user_id !== actorId) {
+        await supabaseAdmin.from('notifications').insert({
+          user_id: prompt.user_id,
+          actor_id: actorId,
+          type: 'copy',
+          prompt_id: prompt.id
+        });
+      }
+    }
+  }
 }
 
 export async function getPublicStats() {

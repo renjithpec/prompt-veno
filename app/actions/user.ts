@@ -103,6 +103,18 @@ export async function submitPrompt(formData: FormData) {
       if (catError) console.error("Failed to insert categories:", catError);
     }
 
+    // 6. Notify Admins
+    const { data: admins } = await supabase.from('profiles').select('id').eq('role', 'admin');
+    if (admins && admins.length > 0) {
+      const notifications = admins.map(admin => ({
+        user_id: admin.id,
+        actor_id: user.id,
+        type: 'pending_approval',
+        prompt_id: prompt.id
+      }));
+      await supabase.from('notifications').insert(notifications);
+    }
+
     revalidatePath("/settings");
     revalidatePath("/admin");
     return { success: true };
@@ -478,6 +490,19 @@ export async function trackShare(promptId: string) {
     if (!supabase) return { success: false };
 
     await supabase.rpc('increment_prompt_shares', { prompt_id: promptId });
+    
+    const { data: { user } } = await supabase.auth.getUser();
+    const { data: prompt } = await supabase.from('prompts').select('user_id').eq('id', promptId).single();
+    
+    if (prompt && prompt.user_id !== user?.id) {
+       await supabase.from('notifications').insert({
+         user_id: prompt.user_id,
+         actor_id: user?.id || null,
+         type: 'share',
+         prompt_id: promptId
+       });
+    }
+
     return { success: true };
   } catch (error) {
     return { success: false };

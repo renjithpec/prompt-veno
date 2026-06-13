@@ -88,7 +88,7 @@ export function NotificationsDropdown({ initialNotifications }: { initialNotific
   };
 
   const getNotificationText = (notification: Notification) => {
-    const actorName = notification.actor?.name || "Someone";
+    const actorName = notification.actor?.name || (notification.actor_id ? "Someone" : "A guest");
     if (notification.type === 'like') {
       return <span><b>{actorName}</b> liked your prompt <i>{notification.prompt?.title}</i></span>;
     }
@@ -101,11 +101,23 @@ export function NotificationsDropdown({ initialNotifications }: { initialNotific
     if (notification.type === 'announcement') {
       return <span><b>{actorName}</b> posted an announcement: <i className="text-muted-foreground">{notification.message?.content}</i></span>;
     }
+    if (notification.type === 'save') {
+      return <span><b>{actorName}</b> saved your prompt: <i>{notification.prompt?.title}</i></span>;
+    }
+    if (notification.type === 'share') {
+      return <span><b>{actorName}</b> shared your prompt: <i>{notification.prompt?.title}</i></span>;
+    }
+    if (notification.type === 'copy') {
+      return <span><b>{actorName}</b> copied your prompt: <i>{notification.prompt?.title}</i></span>;
+    }
+    if (notification.type === 'pending_approval') {
+      return <span className="text-accent"><b>{actorName}</b> submitted a new prompt for approval: <i>{notification.prompt?.title}</i></span>;
+    }
     return <span>New notification</span>;
   };
 
   const getNotificationLink = (notification: Notification) => {
-    if (notification.type === 'like' || notification.type === 'new_post') {
+    if (notification.type === 'like' || notification.type === 'new_post' || notification.type === 'save' || notification.type === 'share' || notification.type === 'copy') {
       return notification.prompt?.slug ? `/prompt/${notification.prompt.slug}` : '#';
     }
     if (notification.type === 'follow') {
@@ -113,6 +125,9 @@ export function NotificationsDropdown({ initialNotifications }: { initialNotific
     }
     if (notification.type === 'announcement') {
       return `/messages`;
+    }
+    if (notification.type === 'pending_approval') {
+      return `/admin`;
     }
     return '#';
   };
@@ -139,23 +154,36 @@ export function NotificationsDropdown({ initialNotifications }: { initialNotific
               You don&apos;t have any notifications yet.
             </div>
           ) : (
-            notifications.map((notification) => (
+            notifications.map((notification) => {
+              const isHighPriority = notification.type === 'pending_approval';
+              
+              return (
               <DropdownMenuItem key={notification.id} asChild className={cn(
                 "p-4 cursor-pointer flex items-start gap-3 border-b border-border/50 last:border-0 rounded-none focus:bg-foreground/5",
-                !notification.is_read && "bg-foreground/[0.02]"
+                !notification.is_read && "bg-foreground/[0.02]",
+                isHighPriority && "bg-accent/10 border-accent/20 focus:bg-accent/20"
               )}>
                 <Link href={getNotificationLink(notification)}>
-                  <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-foreground/10">
+                  <div className={cn(
+                    "relative h-10 w-10 shrink-0 overflow-hidden rounded-full",
+                    isHighPriority ? "bg-accent text-black" : "bg-foreground/10"
+                  )}>
                     {notification.actor?.avatar ? (
                       <Image src={notification.actor.avatar} alt="Avatar" fill className="object-cover" />
                     ) : (
-                      <div className="flex h-full w-full items-center justify-center bg-accent text-xs font-bold text-black">
-                        {(notification.actor?.name || "U")[0].toUpperCase()}
+                      <div className={cn(
+                        "flex h-full w-full items-center justify-center text-xs font-bold",
+                        isHighPriority ? "bg-accent text-black" : "bg-accent text-black"
+                      )}>
+                        {(notification.actor?.name || (notification.actor_id ? "U" : "G"))[0].toUpperCase()}
                       </div>
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm text-foreground leading-tight">
+                    <p className={cn(
+                      "text-sm leading-tight",
+                      isHighPriority ? "text-accent font-medium" : "text-foreground"
+                    )}>
                       {getNotificationText(notification)}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -163,7 +191,10 @@ export function NotificationsDropdown({ initialNotifications }: { initialNotific
                     </p>
                   </div>
                   {!notification.is_read && (
-                    <div className="h-2 w-2 shrink-0 rounded-full bg-accent mt-1.5" />
+                    <div className={cn(
+                      "h-2 w-2 shrink-0 rounded-full mt-1.5",
+                      isHighPriority ? "bg-accent animate-pulse shadow-[0_0_8px_rgba(212,255,58,1)]" : "bg-accent"
+                    )} />
                   )}
                 </Link>
               </DropdownMenuItem>

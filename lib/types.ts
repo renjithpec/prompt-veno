@@ -74,8 +74,8 @@ export type Settings = {
 export type Notification = {
   id: string;
   user_id: string;
-  actor_id: string;
-  type: 'like' | 'follow' | 'new_post' | 'announcement';
+  actor_id: string | null;
+  type: 'like' | 'follow' | 'new_post' | 'announcement' | 'save' | 'share' | 'copy' | 'pending_approval';
   prompt_id: string | null;
   message_id: string | null;
   is_read: boolean;
