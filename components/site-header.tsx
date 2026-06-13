@@ -85,7 +85,7 @@ export function SiteHeader() {
     <header className="fixed top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-2xl md:bottom-4 md:left-4 md:top-4 md:w-[80px] xl:w-[250px] md:rounded-[32px] md:border-2 md:border-border md:bg-panel2/70 md:shadow-[0_0_40px_rgba(0,0,0,0.2)] transition-all duration-300 overflow-visible">
       
       {/* Desktop Sidebar Layout */}
-      <div className="hidden h-full flex-col px-2 xl:px-4 py-6 xl:py-8 md:flex overflow-y-auto no-scrollbar pb-8">
+      <div className="hidden h-full flex-col px-2 xl:px-4 py-6 xl:py-8 md:flex">
         <Link href="/" className="mb-8 xl:mb-10 px-2 flex items-center justify-center xl:justify-start gap-3 shrink-0" aria-label="Prompt Veno home">
           <Image src="/logo-icon.png" alt="Prompt Veno" width={48} height={48} priority className="h-10 w-10 shrink-0" />
           <span className="font-display text-2xl font-black uppercase tracking-widest hidden xl:block leading-none mt-1">Prompt<br/>Veno</span>
