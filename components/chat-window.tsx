@@ -95,11 +95,9 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
       setTimeout(scrollToBottom, 100);
 
       // Subscribe to real-time updates
-      const channelName = `room:${room.id}`;
-      const existingChannel = supabase.getChannels().find((c: any) => c.topic === channelName);
-      if (existingChannel) {
-        await supabase.removeChannel(existingChannel);
-      }
+      // Using a unique channel name prevents "cannot add callbacks after subscribe" errors 
+      // during React Strict Mode's rapid unmount/remount cycles.
+      const channelName = `room:${room.id}-${Date.now()}`;
 
       channel = supabase
         .channel(channelName)
