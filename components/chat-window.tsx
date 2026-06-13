@@ -91,8 +91,14 @@ export function ChatWindow({ room, onOpenSidebar }: { room: Community, onOpenSid
       setTimeout(scrollToBottom, 100);
 
       // Subscribe to real-time updates
+      const channelName = `room:${room.id}`;
+      const existingChannel = supabase.getChannels().find(c => c.topic === channelName);
+      if (existingChannel) {
+        await supabase.removeChannel(existingChannel);
+      }
+
       channel = supabase
-        .channel(`room:${room.id}`)
+        .channel(channelName)
         .on(
           'postgres_changes',
           { event: 'INSERT', schema: 'public', table: 'public_messages', filter: `room_id=eq.${room.id}` },
